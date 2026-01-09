@@ -1,0 +1,811 @@
+Executive Summary
+Product Name: Movie & Series Companion Agent
+Version: 1.0 MVP
+Target Delivery: 24-hour sprint
+Primary User: Students and entertainment enthusiasts
+Core Value Proposition: A personalized AI companion that remembers your viewing history, provides contextual recaps, delivers non-repetitive recommendations, and engages users through interactive entertainment experiences.
+
+1. PROBLEM STATEMENT DECONSTRUCTION
+1.1 Explicit Requirements
+MUST-HAVE Core Features:
+
+✅ Persistent memory system using MongoDB for viewing history
+✅ Google Agent Development Kit (ADK) as the conversational agent framework- the actual LLMs would be from Open AI using LiteLM wrapper look at Google ADK docs and LiteLM Docs
+✅ Recommendation engine that avoids suggesting already-watched or disliked content
+✅ Episode/series recap generation for ongoing shows
+✅ Interactive quiz feature (character identification, fun facts)
+✅ Multi-turn conversational capability with context retention
+✅ Integration with free web search APIs for content discovery
+
+Mandated Technology Stack:
+
+Backend Agent: Google Agent Development Kit
+Database: MongoDB (memory layer)
+Search Integration: Free web APIs (Use DuckDuck Go, u can check out Open AI or online docs on how to call do this!!)
+No commercial platform dependencies
+
+Hard Constraints:
+
+Single-day development timeline
+Lightweight system architecture
+Student-friendly UX (minimal friction)
+No heavy infrastructure requirements
+Must work without commercial streaming platform APIs
+
+1.2 Implicit Expectations
+End User Persona:
+
+Primary: College students (18-25 years old)
+Secondary: Young professionals with limited time
+Behavior: Watches multiple series simultaneously, often forgets plot details, seeks quick recommendations
+Pain Points:
+
+"What happened in the last episode?"
+"I've seen this recommendation 10 times already"
+"I can't remember if I watched this show"
+"What should I watch next that matches my taste?"
+
+
+
+Core Pain Point Solved:
+Fragmented entertainment tracking across platforms + cognitive overload from managing multiple ongoing series + generic, repetitive recommendations.
+Experience Expectation:
+A conversational friend who "gets" your taste, remembers everything you've told them, and makes entertainment discovery feel effortless and fun.
+1.3 Success Criteria Mapping
+CriterionHow We WinInnovationMemory-augmented agent that learns preferences; quiz-based engagementCreativityInteractive character quizzes, personalized recap storytellingPresentation/UIClean chat interface with visual content cards, smooth interactionsUsability/UXZero-setup onboarding, natural language input, instant value deliveryImpact/BenefitsMeasurable time saved, reduced decision fatigue, enhanced viewing experienceTechnical ComplexityMulti-component architecture (ADK + MongoDB + APIs + NLP) in 24hrs
+
+2. INNOVATION THESIS
+
+"While existing streaming platforms treat recommendations as algorithmic outputs without memory, we realized that users need a conversational companion that remembers their journey, so we're creating a memory-augmented entertainment agent that delivers contextual recaps and non-repetitive suggestions in a way that's engaging and interactive."
+
+2.1 Competitive Differentiation
+vs. Netflix/Streaming Platforms:
+
+❌ They: Algorithm-driven, no memory across sessions, repetitive suggestions
+✅ We: Conversational memory, explicit preference learning, anti-repetition logic
+
+vs. Letterboxd/Tracking Apps:
+
+❌ They: Passive logging, no AI interaction, no recaps
+✅ We: Active companion, generates recaps, asks questions, learns preferences
+
+vs. ChatGPT for Entertainment:
+
+❌ They: No persistent memory, generic responses, no structured tracking
+✅ We: MongoDB-backed memory, structured show metadata, personalized history
+
+
+3. FEATURE ARCHITECTURE
+3.1 MUST-HAVE Features (MVP Core)
+Feature 1: Viewing History Management
+User Story: "As a user, I need the agent to remember every show I've mentioned, so I don't have to repeat myself."
+Technical Requirements:
+MongoDB Schema:
+{
+  user_id: String,
+  watched_shows: [{
+    title: String,
+    type: "movie" | "series",
+    status: "completed" | "ongoing" | "dropped",
+    last_episode: { season: Number, episode: Number },
+    rating: Number (1-5),
+    tags: [String], // "funny", "thriller", "slow"
+    date_added: Date,
+    notes: String
+  }],
+  preferences: {
+    liked_genres: [String],
+    disliked_genres: [String],
+    favorite_actors: [String],
+    content_preferences: [String] // "no-horror", "subtitles-ok"
+  }
+}
+Success Metric: 100% recall accuracy when user asks "What have I watched?"
+Demo Impact: Show agent remembering 10+ shows across a conversation without re-asking.
+Build Effort: 3 hours (schema design + CRUD operations + ADK integration)
+
+Feature 2: Smart Recommendation Engine
+User Story: "As a user, I need fresh recommendations that match my taste and don't repeat what I've already seen or rejected."
+Technical Requirements:
+
+Input: User preferences from MongoDB + current mood/request
+Process:
+
+Query TMDB/OMDB API for content matching preferred genres
+Filter out already-watched titles from MongoDB
+Apply anti-repetition logic (track rejected suggestions)
+Rank by relevance score (genre match + rating + recency)
+
+
+Output: 3-5 recommendations with title, year, genre, rating, brief synopsis
+
+Filtering Logic:
+pythondef get_recommendations(user_id, genre=None, mood=None):
+    user_data = mongodb.get_user(user_id)
+    watched_titles = [show['title'] for show in user_data['watched_shows']]
+    rejected_titles = user_data['rejected_suggestions']
+    
+    api_results = tmdb_search(genre=genre, min_rating=7.0)
+    
+    filtered = [
+        show for show in api_results 
+        if show['title'] not in watched_titles 
+        and show['title'] not in rejected_titles
+    ]
+    
+    return rank_by_preference(filtered, user_data['preferences'])[:5]
+```
+
+**Success Metric:** 0% suggestion overlap with viewing history; >80% user acceptance rate
+
+**Demo Impact:** Show 3 rounds of recommendations without repeats, with real-time filtering.
+
+**Build Effort:** 4 hours (API integration + filtering logic + ranking algorithm)
+
+---
+
+#### **Feature 3: Contextual Recap Generation**
+**User Story:** *"As a user, I need a quick recap of where I left off in a series, so I can jump back in without rewatching."*
+
+**Technical Requirements:**
+- **Input:** Series title + last watched episode from MongoDB
+- **Process:**
+  1. Retrieve episode summary from TMDB/OMDB API or web search
+  2. Use Google ADK's LLM to generate concise 3-5 sentence recap
+  3. Highlight key plot points and character developments
+- **Output:** Conversational recap (e.g., "When we last left off, Jon discovered the truth about his parentage...")
+
+**Template:**
+```
+Last time on [Show Name]:
+- Episode watched: S{season}E{episode} - "{Episode Title}"
+- Key events: {generated_summary}
+- What to watch for next: {teaser_hook}
+```
+
+**Success Metric:** Recap accuracy verified against episode wikis; <10 second generation time
+
+**Demo Impact:** User says "What happened in Stranger Things?" → instant, accurate recap
+
+**Build Effort:** 3 hours (API integration + prompt engineering + MongoDB query)
+
+---
+
+#### **Feature 4: Interactive Character Quiz**
+**User Story:** *"As a user, I want fun quizzes about my favorite shows to deepen engagement beyond just tracking."*
+
+**Technical Requirements:**
+- **Quiz Types:**
+  1. **Character from Quote:** Display famous quote → user guesses character
+  2. **Show from Description:** Display plot summary → user guesses show
+  3. **Fun Facts:** Trivia about shows in user's history
+
+- **Data Source:** 
+  - Stored quotes/facts in MongoDB for watched shows
+  - Fallback: Generate quiz from show metadata using ADK's LLM
+
+**Example Flow:**
+```
+Agent: "Let's play! I'll give you a quote from a show you've watched.
+        Ready? 'Winter is coming.' Which character said this?"
+User: "Ned Stark"
+Agent: "Correct! 🎉 From Game of Thrones. Want another?"
+```
+
+**Success Metric:** 3+ quiz types implemented; smooth multi-turn interaction
+
+**Demo Impact:** Live quiz demonstration showing agent pulling from user's watch history
+
+**Build Effort:** 2 hours (quiz logic + response handling + scoring system)
+
+---
+
+#### **Feature 5: Multi-Turn Conversation with Context**
+**User Story:** *"As a user, I need the agent to remember what we just talked about, so conversations feel natural."*
+
+**Technical Requirements:**
+- **Google ADK Session Management:**
+  - Maintain conversation state across turns
+  - Reference previous messages (e.g., "the show you just mentioned")
+  - Handle follow-up questions without re-explaining context
+
+**Example:**
+```
+User: "Recommend a thriller"
+Agent: "How about Mindhunter? FBI agents interview serial killers..."
+User: "Is it scary?"
+Agent: "Mindhunter is more psychological than horror—tense but not jump-scares."
+User: "OK, add it to my list"
+Agent: "Added Mindhunter to your watchlist! Want to start with Season 1?"
+```
+
+**Success Metric:** 5+ turn conversations without context loss
+
+**Demo Impact:** Show fluid 10-turn conversation where agent tracks pronouns and references
+
+**Build Effort:** 2 hours (ADK conversation design + state management)
+
+---
+
+### 3.2 SHOULD-HAVE Features (Differentiators)
+
+#### **Feature 6: Mood-Based Discovery**
+- Natural language mood input: "I want something light and funny"
+- Map moods → genres → recommendations
+
+#### **Feature 7: Watch Progress Tracking**
+- "Mark episode as watched" command
+- Auto-increment to next episode in series
+
+#### **Feature 8: Social Sharing**
+- "What are my friends watching?" (if multi-user)
+- Export watchlist as shareable link
+
+---
+
+### 3.3 COULD-HAVE Features (Polish)
+
+- Visual content cards with posters (if time permits)
+- Voice interaction (future enhancement)
+- Notification reminders for ongoing series
+
+---
+
+### 3.4 WON'T-HAVE Features (Out of Scope)
+
+- Direct streaming integration (beyond scope)
+- User authentication/multi-user support (MVP is single-user)
+- Mobile app (web-based MVP only)
+- Paid API dependencies (MUST use free tiers)
+
+---
+
+## 4. TECHNICAL ARCHITECTURE
+
+### 4.1 System Components
+```
+┌─────────────────────────────────────────────────────────┐
+│                    USER INTERFACE                        │
+│              (Web Chat Interface / CLI)                  │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────┐
+│           GOOGLE AGENT DEVELOPMENT KIT (ADK)             │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │  Conversation Manager (Multi-turn Context)      │    │
+│  ├─────────────────────────────────────────────────┤    │
+│  │  Intent Router (Recommendation/Recap/Quiz)      │    │
+│  ├─────────────────────────────────────────────────┤    │
+│  │  Response Generator (LLM-powered)               │    │
+│  └─────────────────────────────────────────────────┘    │
+└───────────┬─────────────────────────┬───────────────────┘
+            │                         │
+            ▼                         ▼
+┌─────────────────────────┐  ┌──────────────────────────┐
+│    MONGODB ATLAS         │  │   EXTERNAL APIs          │
+│  (Memory Layer)          │  │  - TMDB (free tier)      │
+│  - User History          │  │  - OMDB (free tier)      │
+│  - Preferences           │  │  - Web Search Fallback   │
+│  - Quiz Data             │  │                          │
+└─────────────────────────┘  └──────────────────────────┘
+```
+
+### 4.2 Data Flow for Key Use Cases
+
+#### **Use Case 1: Get Recommendations**
+```
+1. User: "Recommend a sci-fi series"
+2. ADK Intent Router → Recommendation Handler
+3. Query MongoDB → Get user preferences & watch history
+4. Call TMDB API → Search sci-fi series (min_rating=7.0)
+5. Filter results → Remove watched/rejected titles
+6. Rank by relevance → Apply preference scoring
+7. ADK Response Generator → Format top 3 recommendations
+8. Return to user with synopsis and metadata
+```
+
+#### **Use Case 2: Get Recap**
+```
+1. User: "What happened in Breaking Bad?"
+2. ADK Intent Router → Recap Handler
+3. Query MongoDB → Get last watched episode (S5E14)
+4. Call TMDB API → Get episode summary
+5. ADK LLM → Generate conversational recap
+6. Return to user with "Last time on Breaking Bad..."
+```
+
+#### **Use Case 3: Interactive Quiz**
+```
+1. User: "Let's play a quiz"
+2. ADK Intent Router → Quiz Handler
+3. Query MongoDB → Get random watched show + character quotes
+4. ADK Response Generator → Format quiz question
+5. User answers → Validate response
+6. Track score → Store in session state
+7. Offer next question or end quiz
+```
+
+---
+
+## 5. USER EXPERIENCE DESIGN
+
+### 5.1 User Journey Map
+
+#### **First-Time User Experience (FTUE)**
+**Goal:** Deliver value in <60 seconds
+```
+Entry Point: User opens chat interface
+    ↓
+First Message: "Hi! I'm your entertainment companion. 
+                Tell me about a show you recently loved!"
+    ↓
+User Input: "I loved Breaking Bad"
+    ↓ (15 seconds)
+Agent Action: Stores in MongoDB + Analyzes genre/actors
+    ↓
+Aha Moment: "Great choice! Since you loved Breaking Bad's 
+             intense crime drama, you might enjoy Better Call Saul 
+             or Ozark. Want more recommendations?"
+    ↓
+Activation: User says "Yes, more!" → First recommendation delivered
+    ↓
+Retention Hook: "I'll remember your taste. Chat anytime for 
+                 recommendations or recaps!"
+```
+
+**Time to Value:** ~45 seconds  
+**Drop-off Risk:** If agent asks too many setup questions → Solution: Learn passively through conversation
+
+---
+
+#### **Core Use Case: Ongoing User**
+```
+1. User returns after watching 3 episodes of a series
+2. User: "What happened in The Last of Us?"
+3. Agent: Retrieves S1E3 from MongoDB → Generates recap
+4. User: "OK, what should I watch next?"
+5. Agent: Checks watch history → Suggests similar post-apocalyptic shows
+6. User: "Add The Walking Dead to my list"
+7. Agent: Updates MongoDB → Confirms addition
+```
+
+---
+
+### 5.2 Conversation Design Principles
+
+**Tone & Voice:**
+- **Persona:** A knowledgeable friend who's excited about entertainment
+- **Tone:** Casual, enthusiastic, non-judgmental
+- **Voice:** Conversational, uses contractions, occasional pop culture references
+- **Pace:** Quick responses (<3 seconds), respects user's time
+
+**Example Interactions:**
+
+**❌ Bad (Robotic):**
+> "I have processed your request. Here are three recommendations based on your viewing history algorithm score."
+
+**✅ Good (Natural):**
+> "Ooh, based on your love for dark comedies, I think you'd dig Barry, Fleabag, and The End of the F***ing World. Want to know more about any of these?"
+
+---
+
+### 5.3 Visual Design (If Web Interface)
+
+**Design System:**
+- **Primary Color:** #E50914 (Netflix red - familiar to users)
+- **Secondary Color:** #221F1F (Dark background for entertainment context)
+- **Accent Color:** #00D4FF (Bright cyan for CTAs and highlights)
+
+**Layout:**
+- Chat interface (left 60%): Conversation thread
+- Content cards (right 40%): Show posters, metadata, quick actions
+
+**Micro-Interactions:**
+- Typing indicator when agent is "thinking"
+- Subtle confetti animation when quiz answer is correct
+- Smooth card reveal for recommendations
+- "Added to list" checkmark animation
+
+---
+
+## 6. SUCCESS METRICS & KPIs
+
+### 6.1 Quantitative Metrics
+
+**User Engagement:**
+- Average conversation length: Target >5 turns
+- Feature usage: >60% users try recommendations, >30% try quiz
+- Return rate: Target >40% users return within 7 days
+
+**System Performance:**
+- Recommendation accuracy: 0% duplication with watch history
+- Recap generation time: <10 seconds
+- API response time: <2 seconds for recommendations
+- Database query time: <500ms
+
+**Memory Accuracy:**
+- Recall test: Agent remembers 100% of explicitly mentioned shows
+- Preference learning: 80%+ recommendation acceptance rate after 5 interactions
+
+### 6.2 Qualitative Success Indicators
+
+**Judge Reactions (Demo):**
+- ✅ "This is actually useful—I need this!"
+- ✅ "The quiz feature is clever"
+- ✅ "I like that it doesn't repeat suggestions"
+- ✅ "The recaps are surprisingly accurate"
+
+**User Sentiment:**
+- "Finally, something that remembers what I've watched!"
+- "Way better than scrolling Netflix for 30 minutes"
+- "The quiz made me smile—nice touch"
+
+---
+
+## 7. EXECUTION PLAN (24-Hour Sprint)
+
+### 7.1 Time-Boxed Development Schedule
+```
+HOUR 0-2: Setup & Architecture (10%)
+├─ Set up MongoDB Atlas (free tier)
+├─ Initialize Google ADK project
+├─ Configure TMDB API access
+├─ Create basic schema
+└─ Test connectivity
+
+HOUR 2-8: Core Features Development (40%)
+├─ Feature 1: Viewing History CRUD (2 hrs)
+├─ Feature 2: Recommendation Engine (3 hrs)
+└─ Feature 3: Recap Generation (1 hr)
+
+HOUR 8-12: Interactive Features (25%)
+├─ Feature 4: Quiz System (2 hrs)
+├─ Feature 5: Multi-turn Context (2 hrs)
+
+HOUR 12-16: Integration & Testing (15%)
+├─ End-to-end flow testing
+├─ Error handling
+├─ Edge case fixes
+└─ Performance optimization
+
+HOUR 16-20: UI/UX Polish (10%)
+├─ Conversation flow refinement
+├─ Response formatting
+├─ Visual elements (if web UI)
+└─ Demo data population
+
+HOUR 20-24: Demo Preparation (10%)
+├─ Write demo script
+├─ Rehearse 3x
+├─ Create backup video
+├─ Prepare Q&A responses
+└─ Final testing
+
+Checkpoints:
+✓ Hour 8: Can recommend shows without duplication?
+✓ Hour 12: Can generate accurate recaps?
+✓ Hour 16: Does multi-turn conversation work?
+✓ Hour 20: Is demo flow stable?
+```
+
+### 7.2 Risk Mitigation
+
+| Risk | Likelihood | Impact | Mitigation | Contingency |
+|------|-----------|--------|------------|-------------|
+| TMDB API rate limits | Medium | High | Cache responses, use OMDB fallback | Pre-load demo data in MongoDB |
+| ADK complexity | Medium | High | Start with simple intents | Use basic Flask chatbot if ADK fails |
+| MongoDB connection issues | Low | Critical | Use Atlas free tier with uptime SLA | Switch to SQLite local DB |
+| Recap generation accuracy | Medium | Medium | Test with popular shows, refine prompts | Allow manual recap editing |
+| Time overrun | High | Critical | Ruthlessly cut "nice-to-have" features | Demo with 3 core features only |
+
+---
+
+## 8. DEMONSTRATION STRATEGY
+
+### 8.1 Demo Script (15 minutes)
+
+**Act 1: Problem Setup (2 min)**
+> "Let me show you something. Raise your hand if you've ever spent 20 minutes scrolling Netflix just to rewatch The Office again because you couldn't decide what's new."
+>
+> [Show statistic: Average person spends 18 minutes per day choosing what to watch]
+>
+> "What if you had a friend who remembered everything you've watched, never suggested the same thing twice, and could remind you where you left off? That's what we built."
+
+**Act 2: Live Demo (10 min)**
+
+**Demo Flow 1: First Interaction**
+```
+Presenter: "Let me introduce the agent. Watch this."
+
+[Types]: "I just finished watching The Bear"
+
+Agent: "Great choice! The Bear is intense. I'll remember that you 
+        enjoy high-stakes kitchen dramas. Want recommendations 
+        based on that?"
+
+[Types]: "Yes, something similar"
+
+Agent: "How about Boiling Point (single-take restaurant thriller) 
+        or The Menu (dark culinary satire)? Both match that 
+        high-pressure cooking vibe. Or if you want to explore 
+        more character-driven drama, try Succession."
+
+Presenter: "Notice—it learned my preference instantly and gave 
+            specific reasons why each show matches."
+```
+
+**Demo Flow 2: Memory & Recaps**
+```
+[Types]: "What was happening in Succession? I stopped mid-season 3"
+
+Agent: "Last time on Succession: Kendall's shareholder meeting 
+        backfired, Logan announced he's selling Waystar to Matsson, 
+        and Shiv is secretly negotiating her own deal. Things are 
+        about to explode in the next episode!"
+
+Presenter: "It remembered I was watching it AND gave me context 
+            without spoiling what's ahead. Now watch this..."
+
+[Types]: "Recommend something, but not Succession"
+
+Agent: "Got it—adding Succession to your 'seen it' list. How about 
+        Yellowstone for family power dynamics or Billions for 
+        corporate warfare?"
+
+Presenter: "It filtered out what I just mentioned. No repetition."
+```
+
+**Demo Flow 3: Interactive Quiz**
+```
+[Types]: "Let's play a quiz"
+
+Agent: "Fun! Here's a quote from a show you've watched: 
+        'I am the one who knocks.' Who said it?"
+
+[Types]: "Walter White"
+
+Agent: "Correct! 🎉 From Breaking Bad. Another one? 
+        'That's what she said.' Too easy?"
+
+[Types]: "Michael Scott"
+
+Agent: "You know your shows! Want to keep going or explore 
+        new recommendations?"
+Act 3: Vision & Impact (2 min)
+
+"This is more than a tracker. It's a companion that learns, remembers, and enhances how you experience entertainment. Imagine scaling this to:
+
+Group watch parties: 'What should our friend group watch tonight?'
+Learning applications: 'Quiz me on historical documentaries I've seen'
+Content discovery: 'Find hidden gems in genres I didn't know I'd love'
+
+The foundation is here, and it's built on open technology anyone can extend."
+
+Act 4: Q&A Prep (3 min buffer)
+
+8.2 Anticipated Questions & Answers
+Q: How is this different from Netflix's recommendation system?
+A: Netflix uses collaborative filtering (what similar users watched). We use explicit memory and user-stated preferences, which means we can explain why we recommend something and avoid showing you the same suggestions repeatedly. Plus, we're platform-agnostic—works for anything you watch.
+Q: Can this scale to multiple users?
+A: Absolutely. The architecture is designed with user_id as a primary key. For the MVP, we focused on single-user experience to perfect the core features, but multi-user is just a schema extension away.
+Q: What if the API doesn't have a show?
+A: We have a fallback chain: TMDB → OMDB → Web search scraping. For the demo, we focused on popular content that's well-indexed, but the system gracefully handles missing data.
+Q: How do you prevent hallucinations in recaps?
+A: We ground the LLM's generation in actual episode summaries from APIs. We're not asking it to "remember" the show—we're asking it to "summarize this text conversationally," which is a much more reliable use case.
+Q: Is the quiz data manually entered?
+A: For the MVP, we seeded 50+ quotes/facts from popular shows. For production, we'd generate quizzes dynamically using the LLM based on show metadata, or crowdsource from fan wikis.
+
+9. JUDGING CRITERIA OPTIMIZATION
+Innovation (25%)
+Our Edge:
+
+Memory-augmented agent architecture (not just stateless chatbot)
+Anti-repetition filtering (novel approach to recommendations)
+Interactive quiz integration (unique in entertainment tracking)
+
+Talking Points:
+
+"Most AI assistants forget what you told them. We built persistent memory into the core architecture, so every conversation makes the agent smarter about your taste."
+
+Creativity (20%)
+Our Edge:
+
+Quiz feature adds gamification to tracking
+Conversational recap style (vs. dry summaries)
+Mood-based discovery ("I want something cozy")
+
+Talking Points:
+
+"We didn't just build a database with a chat interface. We asked: how do we make tracking fun? The quiz feature turns your watch history into an interactive experience."
+
+Presentation/UI (20%)
+Our Edge:
+
+Clean, distraction-free chat interface
+Visual content cards (if implemented)
+Smooth animations and feedback
+
+Talking Points:
+
+"Entertainment should feel entertaining. Every interaction is designed to feel effortless—from the moment you mention a show to the moment you get a perfect recommendation."
+
+Usability/UX (20%)
+Our Edge:
+
+Zero-setup onboarding (start chatting immediately)
+Natural language input (no rigid commands)
+Context-aware conversations (no repetitive questions)
+
+Talking Points:
+
+"You don't need to fill out a profile or rate 50 shows. Just talk naturally, and the agent learns as you go. Value in under 60 seconds."
+
+Impact/Benefits (15%)
+Our Edge:
+
+Time saved: Average 18 min/day decision paralysis → <2 min with agent
+Enhanced experience: Never lose track of ongoing series
+Measurable outcomes: X shows tracked, Y recommendations accepted
+
+Talking Points:
+
+"Students waste hours per week on 'what should I watch?' We give them that time back while making entertainment discovery more personalized than any streaming platform."
+
+
+10. POST-DEMO MOMENTUM
+10.1 If We Win
+
+ Deploy live demo at [moviecompanion.app]
+ Create demo video for social media
+ Write Medium article: "Building an AI Entertainment Companion in 24 Hours"
+ Submit to Product Hunt
+ Open-source the core framework on GitHub
+
+10.2 If We Don't Win
+
+ Collect judge feedback for iteration
+ Launch anyway on Reddit (r/television, r/movies)
+ Refine based on real user testing
+ Explore monetization (premium features, API access)
+
+
+11. APPENDIX: TECHNICAL SPECIFICATIONS
+11.1 MongoDB Schema (Detailed)
+javascript// users collection
+{
+  _id: ObjectId,
+  user_id: String (unique),
+  created_at: ISODate,
+  watched_shows: [
+    {
+      show_id: String, // from TMDB
+      title: String,
+      type: "movie" | "series",
+      status: "completed" | "ongoing" | "dropped" | "watchlist",
+      last_watched: {
+        season: Number,
+        episode: Number,
+        date: ISODate
+      },
+      rating: Number, // 1-5
+      tags: [String], // user-generated or inferred
+      notes: String,
+      added_date: ISODate
+    }
+  ],
+  preferences: {
+    liked_genres: [String],
+    disliked_genres: [String],
+    favorite_actors: [String],
+    content_preferences: {
+      max_runtime: Number, // minutes
+      subtitle_tolerance: Boolean,
+      language_preferences: [String],
+      avoid_keywords: [String] // "horror", "gore", etc.
+    }
+  },
+  rejected_suggestions: [
+    {
+      title: String,
+      reason: String, // "not interested", "already watched", etc.
+      date: ISODate
+    }
+  ],
+  quiz_stats: {
+    total_questions: Number,
+    correct_answers: Number,
+    favorite_quiz_type: String
+  }
+}
+
+// conversation_sessions collection (for multi-turn context)
+{
+  _id: ObjectId,
+  user_id: String,
+  session_id: String,
+  started_at: ISODate,
+  last_active: ISODate,
+  messages: [
+    {
+      role: "user" | "agent",
+      content: String,
+      timestamp: ISODate,
+      metadata: Object // intent, entities, etc.
+    }
+  ],
+  context: {
+    current_topic: String, // "recommendation", "recap", "quiz"
+    mentioned_shows: [String],
+    active_quiz: Object // quiz state if in progress
+  }
+}
+```
+
+### 11.2 API Endpoints (If Building REST API)
+```
+GET  /api/user/:user_id/history
+POST /api/user/:user_id/add-show
+GET  /api/user/:user_id/recommendations?genre=sci-fi&mood=dark
+GET  /api/show/:show_id/recap?episode=S01E05
+POST /api/quiz/start?user_id=123
+POST /api/quiz/answer
+GET  /api/user/:user_id/stats
+11.3 Environment Variables
+bash# MongoDB
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/moviecompanion
+MONGODB_DATABASE=moviecompanion
+
+# TMDB API
+TMDB_API_KEY=your_tmdb_api_key
+TMDB_BASE_URL=https://api.themoviedb.org/3
+
+# OMDB API (Fallback)
+OMDB_API_KEY=your_omdb_api_key
+OMDB_BASE_URL=http://www.omdbapi.com
+
+# Google ADK
+GOOGLE_ADK_PROJECT_ID=your_project_id
+GOOGLE_ADK_SERVICE_ACCOUNT=path/to/service-account.json
+
+# Application
+PORT=8080
+ENV=development
+LOG_LEVEL=debug
+```
+
+---
+
+## 12. CLOSING CHECKLIST
+
+### Pre-Development ✅
+- [x] PRD reviewed and approved
+- [ ] Technology stack confirmed (Google ADK + MongoDB + TMDB)
+- [ ] MongoDB Atlas account created
+- [ ] TMDB API key obtained
+- [ ] Google ADK credentials configured
+- [ ] Development environment tested
+
+### During Development 🚧
+- [ ] Hour 2: MongoDB schema implemented
+- [ ] Hour 4: Recommendation engine working
+- [ ] Hour 8: Core features integrated
+- [ ] Hour 12: Quiz feature functional
+- [ ] Hour 16: End-to-end flow tested
+- [ ] Hour 20: Demo script finalized
+
+### Demo Day 🎤
+- [ ] Backup video recorded
+- [ ] Demo account with seed data ready
+- [ ] Presentation slides prepared
+- [ ] Team roles assigned (presenter, operator, Q&A)
+- [ ] Contingency plans reviewed
+
+---
+
+## 13. FINAL MANTRA
+```
+"Remember everything.
+Recommend perfectly.
+Engage delightfully.
+Win decisively."
