@@ -1,0 +1,208 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* CinePal Design System - PRD Color Palette */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* CinePal Dark Theme (Primary) - Inspired by movie theater ambiance */
+:root {
+  --radius: 0.75rem;
+  
+  /* PRD Colors - Dark Mode as Default */
+  --background: #0f0d17;
+  --foreground: #e2e1e7;
+  
+  --card: #1a1625;
+  --card-foreground: #e2e1e7;
+  
+  --popover: #1a1625;
+  --popover-foreground: #e2e1e7;
+  
+  /* Violet accent from PRD */
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  
+  --secondary: #252033;
+  --secondary-foreground: #e2e1e7;
+  
+  --muted: #252033;
+  --muted-foreground: #a09dab;
+  
+  /* Violet accent for interactive elements */
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+  
+  /* Rose for destructive actions */
+  --destructive: #f43f5e;
+  
+  --border: #252033;
+  --input: #252033;
+  --ring: #8b5cf6;
+  
+  /* Chart colors */
+  --chart-1: #8b5cf6;
+  --chart-2: #a78bfa;
+  --chart-3: #c4b5fd;
+  --chart-4: #f43f5e;
+  --chart-5: #22c55e;
+  
+  /* Sidebar */
+  --sidebar: #1a1625;
+  --sidebar-foreground: #e2e1e7;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #252033;
+  --sidebar-accent-foreground: #e2e1e7;
+  --sidebar-border: #252033;
+  --sidebar-ring: #8b5cf6;
+}
+
+/* Light mode (optional override) */
+.light {
+  --background: #fafafa;
+  --foreground: #0f0d17;
+  --card: #ffffff;
+  --card-foreground: #0f0d17;
+  --popover: #ffffff;
+  --popover-foreground: #0f0d17;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f3ff;
+  --secondary-foreground: #0f0d17;
+  --muted: #f5f3ff;
+  --muted-foreground: #6b6873;
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #7c3aed;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f0d17;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f3ff;
+  --sidebar-accent-foreground: #0f0d17;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #7c3aed;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+    @apply text-white font-semibold;
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1625;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252033;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}
+
+/* Utility classes from PRD */
+.text-heading {
+  color: #ffffff;
+}
+
+.text-body {
+  color: #e2e1e7;
+}
+
+.text-muted-custom {
+  color: #a09dab;
+}
+
+.text-disabled {
+  color: #6b6873;
+}
+
+.bg-primary-dark {
+  background-color: #0f0d17;
+}
+
+.bg-secondary-dark {
+  background-color: #1a1625;
+}
+
+.bg-tertiary-dark {
+  background-color: #252033;
+}
+
+/* Violet gradient for CTAs */
+.gradient-violet {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+}
+
+/* Card hover effect from PRD */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+}

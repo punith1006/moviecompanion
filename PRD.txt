@@ -1,811 +1,1158 @@
-Executive Summary
-Product Name: Movie & Series Companion Agent
-Version: 1.0 MVP
-Target Delivery: 24-hour sprint
-Primary User: Students and entertainment enthusiasts
-Core Value Proposition: A personalized AI companion that remembers your viewing history, provides contextual recaps, delivers non-repetitive recommendations, and engages users through interactive entertainment experiences.
+# CINEPAL - Product Requirements Document
 
-1. PROBLEM STATEMENT DECONSTRUCTION
-1.1 Explicit Requirements
-MUST-HAVE Core Features:
+## EXECUTIVE SUMMARY
 
-✅ Persistent memory system using MongoDB for viewing history
-✅ Google Agent Development Kit (ADK) as the conversational agent framework- the actual LLMs would be from Open AI using LiteLM wrapper look at Google ADK docs and LiteLM Docs
-✅ Recommendation engine that avoids suggesting already-watched or disliked content
-✅ Episode/series recap generation for ongoing shows
-✅ Interactive quiz feature (character identification, fun facts)
-✅ Multi-turn conversational capability with context retention
-✅ Integration with free web search APIs for content discovery
+**One-liner**: The first AI-powered entertainment companion that remembers your watchlist, generates smart recaps, and makes content discovery a conversational delight—not a chore.
 
-Mandated Technology Stack:
+**Problem**: Students and entertainment enthusiasts struggle with fragmented viewing experiences: they forget what happened in ongoing series, receive repetitive or irrelevant recommendations from streaming platforms, and have no single intelligent companion that truly understands their preferences and enriches their entertainment journey.
 
-Backend Agent: Google Agent Development Kit
-Database: MongoDB (memory layer)
-Search Integration: Free web APIs (Use DuckDuck Go, u can check out Open AI or online docs on how to call do this!!)
-No commercial platform dependencies
+**Solution**: CinePal is a conversational AI companion built with Google Agent Development Kit that combines persistent memory (MongoDB), adaptive reasoning, and interactive engagement. Unlike static tracking apps, CinePal converses naturally, generates contextual recaps, filters out already-watched and rejected content, and gamifies the experience with character quizzes—creating a 10x more engaging entertainment assistant.
 
-Hard Constraints:
+**Target Users**:
+- **Primary**: College students (18-25) who watch 10+ hours of content weekly across multiple platforms
+- **Secondary**: Casual binge-watchers (25-35) overwhelmed by streaming choice paralysis
+- **Tertiary**: Anime/K-drama enthusiasts who track complex storylines across seasons
 
-Single-day development timeline
-Lightweight system architecture
-Student-friendly UX (minimal friction)
-No heavy infrastructure requirements
-Must work without commercial streaming platform APIs
+**Market Opportunity**:
+- TAM: $2.4B global entertainment tracking/discovery market
+- SAM: $400M English-speaking students and young professionals segment
+- SOM: $4M (1% penetration in first year)
 
-1.2 Implicit Expectations
-End User Persona:
+**Competitive Advantage**:
+- 🧠 **Memory-First Architecture**: Unlike Trakt/Letterboxd that just log, CinePal remembers preferences, dislikes, and partial progress
+- 💬 **Conversational AI**: No forms, no clicking—just ask "What should I watch tonight?"
+- 🎮 **Gamified Engagement**: Quote quizzes, trivia, and fun facts keep users returning
 
-Primary: College students (18-25 years old)
-Secondary: Young professionals with limited time
-Behavior: Watches multiple series simultaneously, often forgets plot details, seeks quick recommendations
-Pain Points:
+---
 
-"What happened in the last episode?"
-"I've seen this recommendation 10 times already"
-"I can't remember if I watched this show"
-"What should I watch next that matches my taste?"
+## 1. MARKET CONTEXT & COMPETITIVE LANDSCAPE
 
+### 1.1 Existing Solutions Analysis
 
+**Trakt** - [trakt.tv](https://trakt.tv)
+- Strengths: Excellent episode-level tracking, scrobbling, API ecosystem, detailed statistics
+- Weaknesses: Complex UI, no conversational interface, VIP required for premium features
+- Pricing: Free basic, $30/year VIP
+- Our Advantage: Conversational interaction, AI-generated recaps, no premium paywall for core features
 
-Core Pain Point Solved:
-Fragmented entertainment tracking across platforms + cognitive overload from managing multiple ongoing series + generic, repetitive recommendations.
-Experience Expectation:
-A conversational friend who "gets" your taste, remembers everything you've told them, and makes entertainment discovery feel effortless and fun.
-1.3 Success Criteria Mapping
-CriterionHow We WinInnovationMemory-augmented agent that learns preferences; quiz-based engagementCreativityInteractive character quizzes, personalized recap storytellingPresentation/UIClean chat interface with visual content cards, smooth interactionsUsability/UXZero-setup onboarding, natural language input, instant value deliveryImpact/BenefitsMeasurable time saved, reduced decision fatigue, enhanced viewing experienceTechnical ComplexityMulti-component architecture (ADK + MongoDB + APIs + NLP) in 24hrs
+**Letterboxd** - [letterboxd.com](https://letterboxd.com)
+- Strengths: Beautiful UI, strong social community, excellent movie reviews
+- Weaknesses: Movie-only (no TV shows), no AI recommendations, no recap features
+- Pricing: Free basic, $19.99/year Pro
+- Our Advantage: Full TV show support, AI memory, interactive engagement features
 
-2. INNOVATION THESIS
+**JustWatch** - [justwatch.com](https://justwatch.com)
+- Strengths: Comprehensive streaming availability data, cross-platform
+- Weaknesses: Pure discovery tool, no personalized memory, no recap functionality
+- Pricing: Free with ads
+- Our Advantage: Personalized memory layer, conversational UI, recap generation
 
-"While existing streaming platforms treat recommendations as algorithmic outputs without memory, we realized that users need a conversational companion that remembers their journey, so we're creating a memory-augmented entertainment agent that delivers contextual recaps and non-repetitive suggestions in a way that's engaging and interactive."
+**TV Time** - [tvtime.com](https://tvtime.com)
+- Strengths: Episode tracking, social features, recommendations
+- Weaknesses: Buggy app, intrusive ads, cluttered interface, basic recommendations
+- Pricing: Free with ads, Premium subscription
+- Our Advantage: Clean conversational UI, intelligent AI recommendations, gamified experience
 
-2.1 Competitive Differentiation
-vs. Netflix/Streaming Platforms:
+**SIMKL** - [simkl.com](https://simkl.com)
+- Strengths: Multi-media tracking (anime, K-drama), auto-sync
+- Weaknesses: Complex interface, no AI memory, basic recommendation engine
+- Pricing: Free
+- Our Advantage: True AI memory and reasoning, conversational interface, fun interactions
 
-❌ They: Algorithm-driven, no memory across sessions, repetitive suggestions
-✅ We: Conversational memory, explicit preference learning, anti-repetition logic
+**Serializd** - [serializd.com](https://serializd.com)
+- Strengths: Clean design, Letterboxd-style for TV
+- Weaknesses: New platform, limited features, no AI capabilities
+- Pricing: Free
+- Our Advantage: AI-powered conversations, recaps, quiz features
 
-vs. Letterboxd/Tracking Apps:
+### 1.2 User Pain Points (Research-Backed)
 
-❌ They: Passive logging, no AI interaction, no recaps
-✅ We: Active companion, generates recaps, asks questions, learns preferences
+1. **Repetitive Recommendations** - Netflix/streaming recommendations repeat the same content - Reddit r/movies
+2. **Forgetting Storylines** - "I can't remember what happened last season" - Common complaint across tracking app forums
+3. **Cluttered Interfaces** - TV Time and similar apps overloaded with features - Reddit r/apps
+4. **No Context Memory** - Apps don't remember why you disliked something - User research
+5. **Manual Logging Fatigue** - Marking episodes as watched is tedious - Reddit r/trakt
+6. **Poor Episode Tracking** - Special episodes and non-standard season structures cause issues - Reddit
+7. **Recommendation Bubbles** - Same genres recommended over and over - Multiple streaming forums
+8. **No Fun Engagement** - Tracking apps feel like databases, not companions - User research
+9. **Fragmented Experience** - Different apps for movies vs TV vs anime - Reddit r/androidapps
+10. **Missing Recap Features** - Users resort to YouTube recaps before new seasons - Common user behavior
 
-vs. ChatGPT for Entertainment:
+### 1.3 Market Opportunity
 
-❌ They: No persistent memory, generic responses, no structured tracking
-✅ We: MongoDB-backed memory, structured show metadata, personalized history
+- **Total Addressable Market (TAM)**: $2.4B - Global entertainment discovery and tracking apps market (Statista, 2024)
+- **Serviceable Addressable Market (SAM)**: $400M - English-speaking students and young professionals
+- **Serviceable Obtainable Market (SOM)**: $4M - 1% penetration in year one
+- **Growth Rate**: 12.5% CAGR for entertainment apps sector
+- **Key Trends Enabling Our Solution**:
+  1. Rise of conversational AI (ChatGPT effect) normalizing chat-based interfaces
+  2. Streaming fragmentation creating content discovery fatigue
+  3. Gen-Z preference for AI-assisted decision making
 
+---
 
-3. FEATURE ARCHITECTURE
-3.1 MUST-HAVE Features (MVP Core)
-Feature 1: Viewing History Management
-User Story: "As a user, I need the agent to remember every show I've mentioned, so I don't have to repeat myself."
-Technical Requirements:
-MongoDB Schema:
+## 2. PRODUCT VISION & STRATEGY
+
+### 2.1 Innovation Thesis
+
+Traditional entertainment tracking apps treat users as passive data entry clerks—click to add, scroll to find, repeat. CinePal inverts this paradigm by positioning AI as an active companion that remembers, reasons, and engages.
+
+The core insight is that entertainment consumption is emotional, not transactional. When you pick a movie to watch on Friday night, you're not executing a database query—you're seeking an experience that matches your mood, available time, and social context. CinePal is built to understand this nuanced decision-making process through conversational AI that learns your preferences while making the journey itself enjoyable.
+
+By combining Google's Agent Development Kit with MongoDB's flexible schema for memory, we create a system that maintains context across sessions, avoids recommendation fatigue by explicitly filtering rejected content, and transforms passive tracking into active engagement through quizzes and trivia.
+
+### 2.2 User Personas
+
+#### Primary Persona: Alex - The Overwhelmed Binger
+- **Demographics**: 22-year-old college student, tech-savvy, watches content during study breaks
+- **Goals**: Find something great to watch in under 2 minutes, keep track of 5+ ongoing series
+- **Pain Points**: Forgets plot points between seasons, gets trapped in recommendation loops, wastes time scrolling
+- **Behaviors**: Uses Netflix, Disney+, Prime Video; browses Reddit for recommendations; uses notes app to track shows
+- **Success Metrics**: Time to find next show <60 seconds, never recommends already-watched content
+- **Quote**: "I just spent 30 minutes looking for something to watch and ended up rewatching The Office again."
+
+#### Secondary Persona: Priya - The K-Drama Enthusiast  
+- **Demographics**: 28-year-old working professional, follows Asian dramas and anime
+- **Goals**: Track complex multi-season storylines, discover hidden gems outside mainstream
+- **Pain Points**: Mainstream apps don't track Asian content well, forgets character names between episodes
+- **Behaviors**: Uses Viki, Crunchyroll, Netflix; active in fan communities; maintains spreadsheets
+- **Success Metrics**: Accurate tracking of Asian content, recaps that include character names
+- **Quote**: "I need someone to remind me who that character is before each episode."
+
+#### Tertiary Persona: Marcus - The Social Watcher
+- **Demographics**: 35-year-old, watches with partner, needs family-friendly recommendations
+- **Goals**: Find content both partners enjoy, avoid inappropriate surprise content
+- **Pain Points**: Joint watchlist management is clunky, profiles don't sync preferences
+- **Behaviors**: Uses shared streaming accounts, discusses shows at work
+- **Success Metrics**: Recommendations suitable for couple viewing, easy shared history
+- **Quote**: "We both liked that one show—what else would we both enjoy?"
+
+### 2.3 Value Proposition Canvas
+
+**Jobs to be Done**:
+- Functional: Find relevant content quickly, remember what was watched, catch up on storylines
+- Emotional: Feel in control of entertainment choices, reduce decision anxiety
+- Social: Share recommendations with friends, discuss shows knowledgeably
+
+**Pain Relievers**:
+- Eliminates repetitive recommendations by tracking dislikes and already-watched
+- Removes scroll fatigue through conversational recommendations
+- Prevents "where was I?" confusion with AI-generated recaps
+
+**Gain Creators**:
+- Makes discovery fun through quizzes and trivia
+- Creates personalized experience that improves over time
+- Provides instant recap "warm-up" before returning to a series
+
+---
+
+## 3. PRODUCT FEATURES & REQUIREMENTS
+
+### 3.1 Feature Prioritization Matrix
+
+#### MUST-HAVE FEATURES (MVP Core)
+
+---
+
+**Feature 1: Conversational AI Chat Interface**
+
+- **User Story**: As a user, I need to ask natural language questions about what to watch so that I can get personalized recommendations without navigating complex filters.
+
+- **Acceptance Criteria**:
+  - [ ] Users can type natural language queries like "What should I watch tonight?" or "Something funny and under 2 hours"
+  - [ ] AI responds with 3-5 contextual recommendations with brief reasoning
+  - [ ] Multi-turn conversations maintain context within a session
+  - [ ] Response time <3 seconds for recommendations
+
+- **User Flow**:
+  1. User lands on chat interface (primary screen)
+  2. Sees welcome message with example prompts
+  3. Types question in natural language
+  4. AI processes query against user history and preferences
+  5. Returns formatted recommendations with posters, ratings, and streaming availability
+  6. User can ask follow-up questions or select a title for more info
+
+- **UI/UX Requirements**:
+  - Chat bubble interface with distinct user/AI styling
+  - Recommendation cards with cover art (200x300px), title, year, rating, and streaming icon
+  - Typing indicator animation during AI processing
+  - Quick action buttons: "Add to Watchlist", "Mark as Watched", "Not Interested"
+
+- **Technical Requirements**:
+  - FastAPI endpoint: `POST /api/ai/chat`
+  - Integration with OpenAI/Claude API for natural language understanding
+  - MongoDB query integration for user history context
+  - Caching layer for common recommendation patterns
+
+- **Success Metric**: 80% of users make at least 3 conversational queries in first session
+
+- **Demo Impact**: Immediate "wow" factor—users can just ask, no learning curve
+
+---
+
+**Feature 2: Smart Watch History & Memory**
+
+- **User Story**: As a user, I need the system to remember everything I've watched, liked, and disliked so that it never recommends content I've already seen or explicitly rejected.
+
+- **Acceptance Criteria**:
+  - [ ] Users can mark content as: Watched, Currently Watching (with episode progress), Dropped, Not Interested
+  - [ ] Watch history persists across sessions via MongoDB
+  - [ ] AI recommendations automatically exclude watched/rejected content
+  - [ ] Users can view and edit their complete history
+
+- **User Flow**:
+  1. User searches or receives recommendation
+  2. Clicks status button to mark (quick action)
+  3. For "Currently Watching," prompted to select last episode watched
+  4. History updates in real-time
+  5. Future recommendations reflect this data
+
+- **UI/UX Requirements**:
+  - Status pills with icons (eye=watched, pause=watching, X=dropped, thumbs-down=not interested)
+  - Progress bar for ongoing series showing episodes watched
+  - History page with filters by status, genre, date added
+  - Swipe-to-mark on mobile for quick logging
+
+- **Technical Requirements**:
+  - MongoDB Schema: `WatchHistory { userId, contentId, status, episodeProgress, dateAdded, dateUpdated }`
+  - API endpoints: `GET/POST/PUT /api/history`
+  - Indexed queries for fast history lookup during recommendation generation
+
+- **Success Metric**: Zero recommendations of already-watched content after first 10 interactions
+
+- **Demo Impact**: Shows the "memory" differentiator—system gets smarter with use
+
+---
+
+**Feature 3: AI-Powered Episode Recaps**
+
+- **User Story**: As a user returning to an ongoing series, I need a quick recap of what happened in previous episodes so that I can jump back in without confusion.
+
+- **Acceptance Criteria**:
+  - [ ] Users can request "Recap of [Show Name]" via chat or button
+  - [ ] AI generates spoiler-conscious recap up to user's current episode
+  - [ ] Recap covers key plot points, character developments, cliffhangers
+  - [ ] Loading time <5 seconds for recap generation
+
+- **User Flow**:
+  1. User navigates to "Currently Watching" section or asks in chat
+  2. Clicks "Get Recap" button on a show card
+  3. System identifies user's progress (e.g., "You're on Season 2, Episode 5")
+  4. AI generates contextual recap of S1 through S2E4
+  5. Displays recap with optional TL;DR toggle
+
+- **UI/UX Requirements**:
+  - Accordion-style recap with season/episode breakdowns
+  - TL;DR mode (2-3 sentences) vs Full Recap toggle
+  - Character name highlights with optional "who is this?" tooltips
+  - Spoiler warning before showing content past user's current episode
+
+- **Technical Requirements**:
+  - FastAPI endpoint: `POST /api/ai/recap`
+  - Integration with content databases (TMDb, IMDb) for episode data
+  - LLM prompt engineering for spoiler-aware recap generation
+  - Caching recaps per show/episode combination
+
+- **Success Metric**: 60% of returning users request at least one recap per week
+
+- **Demo Impact**: Unique feature—no competitor offers this at scale
+
+---
+
+**Feature 4: Content Search & Discovery**
+
+- **User Story**: As a user, I need to search for specific movies or shows so that I can add them to my watchlist or mark them as watched.
+
+- **Acceptance Criteria**:
+  - [ ] Search by title with autocomplete suggestions
+  - [ ] Results show movies and TV shows with relevant metadata
+  - [ ] Integration with TMDb or similar API for comprehensive content database
+  - [ ] Search results filterable by type (movie/show), year, genre
+
+- **User Flow**:
+  1. User clicks search icon or types in chat "search for [title]"
+  2. Autocomplete shows matching titles as user types
+  3. User selects result
+  4. Detail modal/page shows: synopsis, rating, cast, streaming availability, user actions
+  5. User can add to watchlist, mark as watched, or get recap
+
+- **UI/UX Requirements**:
+  - Instant search with debounced API calls (300ms delay)
+  - Cover art thumbnails in search results
+  - Clear distinction between movies and TV shows
+  - Empty state with trending/popular suggestions
+
+- **Technical Requirements**:
+  - TMDb API integration for content search
+  - Node.js caching layer for popular searches
+  - Frontend debouncing and optimistic UI updates
+
+- **Success Metric**: Search-to-action conversion >50%
+
+- **Demo Impact**: Proves the comprehensive database behind the AI
+
+---
+
+**Feature 5: Personalized Recommendations Engine**
+
+- **User Story**: As a user, I need proactive recommendations based on my watch history and preferences so that I can discover new content I'll actually enjoy.
+
+- **Acceptance Criteria**:
+  - [ ] System generates daily/weekly personalized recommendations
+  - [ ] Recommendations weighted by: watch history, liked genres, viewing patterns
+  - [ ] Excludes all watched, dropped, and "not interested" content
+  - [ ] Provides reasoning for why each item is recommended
+
+- **User Flow**:
+  1. User opens app to homepage
+  2. Sees "Recommended for You" section with 6-10 curated picks
+  3. Each card shows brief reason ("Because you loved Breaking Bad...")
+  4. User can dismiss (teaches the algorithm) or explore
+
+- **UI/UX Requirements**:
+  - Horizontal scrollable carousel with large cover art
+  - "Why this?" dropdown showing recommendation reasoning
+  - Quick actions: Add to Watchlist, Dismiss, More Like This
+  - Refresh button to get new recommendations
+
+- **Technical Requirements**:
+  - Python ML service for recommendation scoring
+  - Hybrid approach: collaborative filtering + content-based + LLM enhancement
+  - Scheduled background jobs for pre-computing recommendations
+  - A/B testing infrastructure for algorithm improvements
+
+- **Success Metric**: Recommendation click-through rate >25%
+
+- **Demo Impact**: Shows AI learning from user behavior
+
+---
+
+**Feature 6: User Authentication & Profile**
+
+- **User Story**: As a user, I need to create an account so that my watch history and preferences persist across devices and sessions.
+
+- **Acceptance Criteria**:
+  - [ ] Email/password registration and login
+  - [ ] OAuth login (Google at minimum)
+  - [ ] Profile with editable display name and avatar
+  - [ ] Secure JWT-based session management
+
+- **User Flow**:
+  1. New user lands on marketing page
+  2. Clicks "Get Started" → Registration form (email, password, name)
+  3. Optional: Connect with Google OAuth
+  4. Email verification (optional for MVP, add post-launch)
+  5. Redirects to onboarding flow
+
+- **UI/UX Requirements**:
+  - Clean modal-based auth flow
+  - Social login buttons prominent but not overwhelming
+  - Password strength indicator
+  - Clear error messages for validation failures
+
+- **Technical Requirements**:
+  - bcrypt password hashing
+  - JWT access tokens (15min) + refresh tokens (7 days)
+  - HTTP-only cookies for refresh token storage
+  - Google OAuth 2.0 integration
+
+- **Success Metric**: >80% of users complete registration within 2 minutes
+
+- **Demo Impact**: Professional, polished authentication experience
+
+---
+
+#### SHOULD-HAVE FEATURES (Differentiators)
+
+---
+
+**Feature 7: Interactive Character Quiz**
+
+- **User Story**: As a user, I want fun quizzes about shows I've watched so that I can test my knowledge and engage with my entertainment in a playful way.
+
+- **Acceptance Criteria**:
+  - [ ] Quiz generates questions from user's watch history
+  - [ ] Questions include: character identification, famous quotes, plot events
+  - [ ] Scoring system with streaks and achievements
+  - [ ] Daily quiz challenge
+
+- **User Flow**:
+  1. User navigates to "Quiz" tab or asks "Quiz me!"
+  2. System selects show from watch history
+  3. Presents 5-question multiple choice quiz
+  4. Shows results with fun facts about wrong answers
+  5. Records score for streak tracking
+
+- **UI/UX Requirements**:
+  - Gamified UI with progress indicators
+  - Animated correct/incorrect feedback
+  - Streak counter with fire emoji 🔥
+  - Share button for social media
+
+- **Technical Requirements**:
+  - Pre-generated quiz bank per content title
+  - Dynamic question selection based on user history
+  - Score persistence in MongoDB
+
+- **Success Metric**: 40% weekly active users attempt at least one quiz
+
+- **Demo Impact**: Unique engagement feature that creates "delight"
+
+---
+
+**Feature 8: Watchlist Management**
+
+- **User Story**: As a user, I need to save content for later so that I don't forget titles I want to watch.
+
+- **Acceptance Criteria**:
+  - [ ] One-click "Add to Watchlist" from any content card
+  - [ ] Organized watchlist with sorting/filtering options
+  - [ ] Priority markers (Must Watch, Interested, Maybe)
+  - [ ] Watchlist accessible from chat ("Show me my watchlist")
+
+- **UI/UX Requirements**:
+  - Dedicated watchlist page with grid/list view toggle
+  - Drag-and-drop reordering
+  - Filter by genre, type, priority
+  - Empty state encouragement if list is empty
+
+- **Technical Requirements**:
+  - MongoDB collection for watchlist items
+  - API endpoints for CRUD operations
+  - Integration with recommendation engine to prioritize watchlist items
+
+- **Success Metric**: Average user has 5+ items in watchlist after first week
+
+---
+
+**Feature 9: Streaming Availability Integration**
+
+- **User Story**: As a user, I need to know where I can stream a movie or show so that I don't waste time searching across platforms.
+
+- **Acceptance Criteria**:
+  - [ ] Content details show available streaming platforms
+  - [ ] Deep links to streaming apps where possible
+  - [ ] Region-aware availability (US, UK, India, etc.)
+
+- **Technical Requirements**:
+  - JustWatch API or similar for streaming data
+  - User region detection or preference setting
+  - Cached availability data with daily refresh
+
+- **Success Metric**: 30% of recommendation interactions include streaming platform clicks
+
+---
+
+#### COULD-HAVE FEATURES (Polish)
+
+---
+
+**Feature 10: Fun Facts & Trivia**
+
+- Contextual trivia displayed on content pages
+- "Did you know?" cards during idle chat moments
+
+**Feature 11: Social Sharing**
+
+- Share recommendations to Twitter/WhatsApp
+- Shareable quiz scores and streaks
+
+**Feature 12: Dark/Light Mode Toggle**
+
+- System preference detection
+- Manual override in settings
+
+**Feature 13: Export Watch History**
+
+- CSV export for power users
+- Integration with Trakt import/export
+
+---
+
+#### WON'T-HAVE (Future Roadmap)
+
+- **Multi-user Profiles**: Family/shared account support (post-MVP)
+- **Mobile Native Apps**: iOS/Android (web-first approach for MVP)
+- **Social Following**: Follow friends' watch activity (requires critical mass)
+- **Calendar Integration**: Sync release dates to personal calendar
+- **Spoiler Community**: User-submitted recap contributions
+- **Voice Interface**: Alexa/Google Home integration
+
+---
+
+### 3.2 Critical User Journeys
+
+#### Journey 1: First-Time User Experience (FTUE)
+
+**Goal**: Deliver value in <60 seconds
+
+**Flow**:
+
+1. **Landing Page**
+   - Screen: Hero section with animated chat demo
+   - Copy: "Your AI Entertainment Companion" / "Tell me what you love—I'll remember forever."
+   - CTA: "Start Chatting Free" (primary), "See How It Works" (secondary)
+   - Design Note: Dark gradient background (#0f0d17 to #1a1625), floating movie poster elements
+
+2. **Quick Onboarding (30 seconds)**
+   - Approach: Conversational onboarding in chat interface itself
+   - Data Collected: 3 favorite shows/movies (suggested via autocomplete)
+   - AI Response: "Great taste! Based on these, I already have 5 ideas for you. Want to see them?"
+
+3. **Aha Moment** (~45 seconds from start)
+   - Trigger: AI presents first batch of personalized recommendations
+   - Experience: "I noticed you like dark thrillers—here's something you probably haven't seen..."
+   - User sees recommendations they haven't watched
+
+4. **First Core Action**
+   - What: User adds item to watchlist or marks as "Already Watched"
+   - Friction Points Eliminated: No complex forms, just quick action buttons
+   - Success State: Confirmation with "I've noted that! Now I'll never recommend it again."
+
+5. **Retention Hook**
+   - Why Return: Daily quiz notification, new recommendations based on growing profile
+   - Mechanism: Streak counter ("You're on a 3-day streak!"), email digest (weekly)
+
+**Edge Cases & Error Handling**:
+- User inputs unknown title → AI asks for clarification or offers closest matches
+- API rate limit hit → Show cached recommendations with "Refreshing in a moment..."
+- Network error during onboarding → Local storage preserves progress, sync on reconnect
+
+---
+
+#### Journey 2: Getting a Recap for an Ongoing Series
+
+**Goal**: Catch up on a show in under 30 seconds
+
+**Flow**:
+
+1. User asks: "Catch me up on Stranger Things" or clicks "Get Recap" on show card
+2. System checks user's progress: "You're on Season 4, Episode 2"
+3. AI generates recap: "Here's what happened from Season 1 through Season 4 Episode 1..."
+4. User reads TL;DR or expands for full recap
+5. User continues watching with full context
+
+---
+
+#### Journey 3: Finding Something to Watch Tonight
+
+**Goal**: Get a great recommendation in under 60 seconds
+
+**Flow**:
+
+1. User opens app → Chat greeting: "Hey! What are you in the mood for tonight?"
+2. User types: "Something funny, not too long, I'm tired"
+3. AI processes: Filters comedies <90 min, excludes watched content
+4. Returns 3 options with streaming availability
+5. User picks one → "Great choice! I'll add it to your watch history. Enjoy!"
+
+---
+
+## 4. USER EXPERIENCE & DESIGN SPECIFICATIONS
+
+### 4.1 Design Philosophy
+
+**Core Emotion**: Empowered, Delighted, Understood
+
+**Brand Personality**: If CinePal was a person, they'd be a knowledgeable friend who loves movies, never judges your guilty pleasures, and always has a great recommendation ready. Warm but smart, playful but reliable.
+
+**Visual Metaphors**: A cozy movie night (warm, inviting), a personal concierge (helpful, attentive), a trivia night (fun, engaging)
+
+**Competitive Visual Differentiation**: While Letterboxd is artsy-minimalist and Trakt is data-dense, CinePal embraces approachable warmth with conversational UI and subtle animations.
+
+### 4.2 Design System
+
+#### Color Palette
+
+**Dark Mode (Primary)**:
+- **Background Primary**: `#0f0d17` - Deep space black with purple undertone - Main app background
+- **Background Secondary**: `#1a1625` - Elevated surfaces, cards
+- **Background Tertiary**: `#252033` - Input fields, hover states
+
+**Accent Colors**:
+- **Primary**: `#8b5cf6` (Violet 500) - CTAs, selected states, interactive elements
+- **Primary Hover**: `#a78bfa` (Violet 400) - Hover states
+- **Secondary**: `#f43f5e` (Rose 500) - Notifications, badges, hearts
+- **Success**: `#22c55e` (Green 500) - Watched status, confirmations
+- **Warning**: `#f59e0b` (Amber 500) - In-progress, partial states
+- **Error**: `#ef4444` (Red 500) - Errors, remove actions
+
+**Text Colors**:
+- **Heading**: `#ffffff` - 100% white for headers
+- **Body**: `#e2e1e7` - Slightly muted for readability
+- **Muted**: `#a09dab` - Secondary text, timestamps
+- **Disabled**: `#6b6873` - Inactive states
+
+**Rationale**: Deep purple-black backgrounds evoke the magic of a movie theater. Violet accents feel modern and premium without the corporate blue of productivity apps.
+
+#### Typography
+
+**Font Stack**:
+- **Display/Headlines**: `'Outfit', sans-serif` (Google Fonts) - Weights: 600, 700
+  - H1: 48px/56px (landing), 32px/40px (in-app)
+  - H2: 24px/32px
+  - H3: 20px/28px
+  
+- **Body**: `'Inter', sans-serif` (Google Fonts) - Weights: 400, 500, 600
+  - Body Large: 18px/28px
+  - Body: 16px/24px
+  - Body Small: 14px/20px
+
+- **UI/Captions**: `'Inter', sans-serif` - Weight: 500
+  - Button: 14px/20px, letter-spacing: 0.02em
+  - Caption: 12px/16px
+
+- **Code/Data**: `'JetBrains Mono', monospace` - For any data display
+
+#### Spacing System
+
+- Base unit: 4px
+- Scale: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128
+- Card padding: 16px (small), 24px (default), 32px (hero)
+- Section gaps: 48px (between major sections), 24px (within sections)
+
+#### Iconography Approach
+
+- **Style**: Outlined with 1.5px stroke weight, rounded caps
+- **Source**: Lucide React (customized) - NOT generic FontAwesome
+- **Design Direction**: Rounded, friendly, consistent 24x24px sizing
+- **Implementation**: React components for full color/size control
+- **Key Icons Needed**:
+  - Chat bubble (conversation)
+  - Eye (watched)
+  - Clock (in progress)
+  - Heart (favorite)
+  - Bookmark (watchlist)
+  - Play (streaming link)
+  - Brain (AI/smart features)
+  - Trophy (quiz/gamification)
+
+#### Component Library
+
+**Using**: shadcn/ui as base with heavy customization
+
+**Buttons**:
+- Primary: Violet gradient background, white text, 12px radius
+- Secondary: Ghost/outline style, violet border
+- Destructive: Rose background for remove/delete
+- States: Hover (lift + glow), Active (pressed), Loading (spinner)
+
+**Cards**:
+- Content cards: 12px radius, subtle border (#252033), hover lift with shadow
+- Chat bubbles: User (violet bg, right aligned), AI (secondary bg, left aligned)
+
+**Inputs**:
+- Rounded (12px radius), dark background
+- Focus: Violet ring with glow
+- Error: Red border with shake animation
+
+**Modals/Dialogs**:
+- Centered, fade + scale animation
+- Dark overlay (black 80% opacity)
+- Close button top-right
+
+### 4.3 Micro-Interactions & Animations
+
+**Philosophy**: Motion should guide attention, provide feedback, and add personality—never distract.
+
+**Key Animations**:
+
+- **Loading States**: 
+  - Skeleton loading with shimmer effect for cards
+  - AI typing indicator: 3 bouncing dots, violet color
+  
+- **Success Confirmations**: 
+  - Checkmark draw animation (0.3s)
+  - Subtle confetti burst for quiz completion
+  
+- **Error Handling**: 
+  - Input shake (200ms, 3 oscillations)
+  - Red border fade-in
+  
+- **Transitions**: 
+  - Page transitions: Fade (200ms) + subtle slide (10px)
+  - Modal: Scale from 95% + fade (200ms)
+  
+- **Hover States**: 
+  - Cards: Lift (translateY -4px) + shadow increase
+  - Buttons: Subtle glow + color shift
+  
+- **Empty States**: 
+  - Custom illustration (simple, line-art style)
+  - Encouraging copy: "Your watchlist is empty—ask me for recommendations!"
+
+**Performance Budget**: Max animation duration 400ms, 60fps minimum
+
+### 4.4 Responsive Design Strategy
+
+- **Breakpoints**:
+  - Mobile: <640px (single column, full-width chat)
+  - Tablet: 640-1024px (two columns where applicable)
+  - Desktop: >1024px (sidebar + main content layout)
+
+- **Mobile-First Considerations**:
+  - Touch targets minimum 44x44px
+  - Bottom navigation for key actions
+  - Chat input fixed at bottom
+  - Swipe gestures for quick actions
+
+### 4.5 Accessibility Standards
+
+- [ ] WCAG 2.1 AA compliance
+- [ ] Color contrast: 4.5:1 minimum for text
+- [ ] Keyboard navigation for all interactions
+- [ ] Screen reader announcements for dynamic content
+- [ ] Focus indicators (2px violet ring)
+- [ ] Alt text for all images and posters
+- [ ] Error messages: Clear, actionable, persistent
+- [ ] Reduced motion preference respected
+
+### 4.6 Content Strategy & Voice
+
+**Tone Attributes**: Friendly, Knowledgeable, Playful
+
+**Writing Principles**:
+- Conversational, not robotic ("I found something you'll love" not "Results found")
+- Brief but warm ("Great pick!" not just "Added")
+- Optional personality (quips can be toggled off)
+
+**Key Microcopy Examples**:
+- Empty watchlist: "Your watchlist is looking lonely. Want me to suggest something?"
+- Error: "Oops! Something went wrong on my end. Let's try that again."
+- Success: "Added to your watchlist! I'll keep an eye on streaming availability for you."
+- Loading: "Thinking... 🎬"
+- CTA: "Add to Watchlist" / "Start Quiz" / "Get Recap"
+
+### 4.7 Design References & Inspiration
+
+- **Linear.app**: Clean, dark interface with excellent hover states
+- **Raycast.app**: Conversational command interface
+- **Apple TV+**: Premium content presentation
+- **Letterboxd**: Cover art-centric layouts
+
+**Our Differentiation**: We combine Letterboxd's visual beauty with a chat-first paradigm, creating something that feels like a luxurious AI concierge rather than a database.
+
+---
+
+## 5. TECHNICAL ARCHITECTURE
+
+### 5.1 System Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      User Browser                           │
+│                     (React/Next.js)                         │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ HTTPS
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 Next.js Frontend (Port 3000)                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │ Chat UI     │  │ History     │  │ Search/Discovery    │ │
+│  │ Component   │  │ Dashboard   │  │ Components          │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ REST API
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│               Node.js Backend API (Port 8000)               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │ Auth        │  │ User        │  │ Content             │ │
+│  │ Controller  │  │ Controller  │  │ Controller          │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└─────────┬──────────────────────────────────────┬────────────┘
+          │                                      │
+          ▼                                      ▼
+┌─────────────────────┐              ┌────────────────────────┐
+│   MongoDB Atlas     │              │ Python AI Service      │
+│                     │              │     (Port 5000)        │
+│  • Users            │              │                        │
+│  • WatchHistory     │              │  • Chat/Recommendations│
+│  • Preferences      │              │  • Recap Generation    │
+│  • Watchlist        │              │  • Quiz Generation     │
+└─────────────────────┘              │  • ML Models           │
+                                     └───────────┬────────────┘
+                                                 │
+                                     ┌───────────▼────────────┐
+                                     │   External APIs        │
+                                     │  • OpenAI/Claude       │
+                                     │  • TMDb                │
+                                     │  • JustWatch           │
+                                     └────────────────────────┘
+```
+
+**Architecture Pattern**: Microservices with clear service boundaries
+
+**Communication**: RESTful APIs with JWT authentication
+
+### 5.2 Frontend Architecture (Next.js + React + Tailwind)
+
+#### Technology Stack
+- **Framework**: Next.js 14+ with App Router
+- **Styling**: Tailwind CSS 3.4+ with custom theme
+- **State Management**: Zustand for global state, TanStack Query for server state
+- **Form Handling**: React Hook Form + Zod validation
+- **Data Fetching**: Server Components + TanStack Query for client
+- **UI Components**: shadcn/ui customized
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+
+#### Project Structure
+```
+/src
+  /app
+    /(auth)
+      /login/page.tsx
+      /register/page.tsx
+    /(dashboard)
+      /chat/page.tsx
+      /history/page.tsx
+      /watchlist/page.tsx
+      /quiz/page.tsx
+      /settings/page.tsx
+      /layout.tsx
+    /api
+      /[...proxy]/route.ts
+    /layout.tsx
+    /page.tsx
+  /components
+    /ui              # shadcn/ui components
+    /chat            # Chat-specific components
+    /content         # Movie/Show cards, details
+    /quiz            # Quiz components
+    /layouts         # Header, Sidebar, Footer
+  /lib
+    /api             # API client functions
+    /hooks           # Custom React hooks
+    /utils           # Utility functions
+    /validations     # Zod schemas
+    /stores          # Zustand stores
+  /styles
+    /globals.css
+```
+
+#### Key Frontend Features Implementation
+
+**Chat Interface**:
+- Components: ChatContainer, MessageBubble, TypingIndicator, QuickActions
+- State: Messages stored in Zustand, persisted to localStorage
+- API: Streaming responses via fetch with text/event-stream
+
+### 5.3 Backend Architecture (Node.js)
+
+#### Technology Stack
+- **Framework**: Express.js 4.18+
+- **Language**: TypeScript 5+
+- **Database ORM**: Mongoose (MongoDB)
+- **Authentication**: JWT + refresh tokens, bcrypt
+- **Validation**: Zod
+- **Real-time**: Socket.io (for chat typing indicators)
+
+#### Project Structure
+```
+/src
+  /controllers
+    /auth.controller.ts
+    /user.controller.ts
+    /history.controller.ts
+    /watchlist.controller.ts
+  /services
+    /auth.service.ts
+    /content.service.ts
+    /recommendation.service.ts
+  /models
+    /user.model.ts
+    /watchHistory.model.ts
+    /watchlist.model.ts
+  /routes
+    /index.ts
+    /auth.routes.ts
+    /user.routes.ts
+    /history.routes.ts
+  /middleware
+    /auth.middleware.ts
+    /error.middleware.ts
+    /validate.middleware.ts
+  /config
+    /database.ts
+    /env.ts
+  /types
+    /index.ts
+```
+
+#### Database Schema
+
+**User**
+```typescript
 {
-  user_id: String,
-  watched_shows: [{
-    title: String,
-    type: "movie" | "series",
-    status: "completed" | "ongoing" | "dropped",
-    last_episode: { season: Number, episode: Number },
-    rating: Number (1-5),
-    tags: [String], // "funny", "thriller", "slow"
-    date_added: Date,
-    notes: String
-  }],
+  _id: ObjectId,
+  email: string (unique, indexed),
+  passwordHash: string,
+  name: string,
+  avatarUrl?: string,
   preferences: {
-    liked_genres: [String],
-    disliked_genres: [String],
-    favorite_actors: [String],
-    content_preferences: [String] // "no-horror", "subtitles-ok"
-  }
+    favoriteGenres: string[],
+    streamingServices: string[],
+    contentRatings: string[]
+  },
+  quizStats: {
+    totalCorrect: number,
+    streak: number,
+    lastPlayed: Date
+  },
+  createdAt: Date,
+  updatedAt: Date
 }
-Success Metric: 100% recall accuracy when user asks "What have I watched?"
-Demo Impact: Show agent remembering 10+ shows across a conversation without re-asking.
-Build Effort: 3 hours (schema design + CRUD operations + ADK integration)
-
-Feature 2: Smart Recommendation Engine
-User Story: "As a user, I need fresh recommendations that match my taste and don't repeat what I've already seen or rejected."
-Technical Requirements:
-
-Input: User preferences from MongoDB + current mood/request
-Process:
-
-Query TMDB/OMDB API for content matching preferred genres
-Filter out already-watched titles from MongoDB
-Apply anti-repetition logic (track rejected suggestions)
-Rank by relevance score (genre match + rating + recency)
-
-
-Output: 3-5 recommendations with title, year, genre, rating, brief synopsis
-
-Filtering Logic:
-pythondef get_recommendations(user_id, genre=None, mood=None):
-    user_data = mongodb.get_user(user_id)
-    watched_titles = [show['title'] for show in user_data['watched_shows']]
-    rejected_titles = user_data['rejected_suggestions']
-    
-    api_results = tmdb_search(genre=genre, min_rating=7.0)
-    
-    filtered = [
-        show for show in api_results 
-        if show['title'] not in watched_titles 
-        and show['title'] not in rejected_titles
-    ]
-    
-    return rank_by_preference(filtered, user_data['preferences'])[:5]
 ```
 
-**Success Metric:** 0% suggestion overlap with viewing history; >80% user acceptance rate
+**WatchHistory**
+```typescript
+{
+  _id: ObjectId,
+  userId: ObjectId (indexed),
+  contentId: string (TMDb ID),
+  contentType: 'movie' | 'tv',
+  status: 'watched' | 'watching' | 'dropped' | 'not_interested',
+  rating?: number (1-10),
+  episodeProgress?: {
+    season: number,
+    episode: number
+  },
+  dateAdded: Date,
+  dateUpdated: Date
+}
+```
 
-**Demo Impact:** Show 3 rounds of recommendations without repeats, with real-time filtering.
+**Watchlist**
+```typescript
+{
+  _id: ObjectId,
+  userId: ObjectId (indexed),
+  contentId: string,
+  contentType: 'movie' | 'tv',
+  priority: 'must_watch' | 'interested' | 'maybe',
+  dateAdded: Date
+}
+```
 
-**Build Effort:** 4 hours (API integration + filtering logic + ranking algorithm)
+#### API Endpoints Specification
+
+**Authentication**
+
+`POST /api/auth/register`
+- Request: `{ email, password, name }`
+- Response (201): `{ user: { id, email, name }, accessToken, refreshToken }`
+- Errors: 400 (validation), 409 (email exists)
+
+`POST /api/auth/login`
+- Request: `{ email, password }`
+- Response (200): `{ user, accessToken, refreshToken }`
+- Errors: 401 (invalid credentials)
+
+`POST /api/auth/refresh`
+- Request: (refreshToken in httpOnly cookie)
+- Response (200): `{ accessToken }`
+
+`POST /api/auth/logout`
+- Response (200): `{ success: true }`
+
+**Watch History**
+
+`GET /api/history`
+- Query: `?status=watched&page=1&limit=20`
+- Response: Paginated history items
+
+`POST /api/history`
+- Request: `{ contentId, contentType, status, episodeProgress? }`
+- Response (201): Created history item
+
+`PUT /api/history/:id`
+- Request: Partial update fields
+- Response (200): Updated item
+
+`DELETE /api/history/:id`
+- Response (204): No content
+
+**Watchlist**
+
+`GET /api/watchlist`
+`POST /api/watchlist`
+`DELETE /api/watchlist/:id`
+
+**AI Proxy**
+
+`POST /api/ai/chat`
+- Proxies to Python AI service
+- Adds user context (history, preferences) before forwarding
+
+### 5.4 AI Service Architecture (Python FastAPI)
+
+#### Technology Stack
+- **Framework**: FastAPI 0.104+
+- **LLM Integration**: OpenAI API (GPT-4) / Anthropic Claude
+- **ML Libraries**: scikit-learn, sentence-transformers
+- **Content API**: TMDb API
+- **Async Processing**: Background tasks for recap caching
+
+#### Project Structure
+```
+/src
+  /api
+    /chat.py
+    /recommendations.py
+    /recaps.py
+    /quiz.py
+  /services
+    /llm_service.py
+    /tmdb_service.py
+    /recommendation_engine.py
+  /models
+    /schemas.py
+  /config
+    /settings.py
+  /prompts
+    /chat_prompt.py
+    /recap_prompt.py
+    /quiz_prompt.py
+  main.py
+```
+
+#### ML Features Implementation
+
+**Conversational Recommendations**:
+- Input: User message + watch history + preferences
+- Process: LLM with structured prompt containing user context
+- Output: 3-5 recommendations with reasoning
+
+**Episode Recaps**:
+- Input: Show ID + user's current episode
+- Process: Fetch episode data from TMDb → LLM summarization with spoiler awareness
+- Output: Structured recap (TL;DR + full version)
+
+**Quiz Generation**:
+- Pre-generated quiz banks per popular show
+- Dynamic selection based on user's watch history
+- Mix of trivia, quote identification, character matching
+
+### 5.5 Third-Party Integrations
+
+**TMDb API**
+- Purpose: Content metadata, images, episode data
+- Rate Limits: 40 requests/10 seconds
+- Fallback: Redis cache for popular content
+
+**OpenAI API**
+- Purpose: Chat responses, recap generation
+- Rate Limits: Model-dependent
+- Fallback: Degraded mode with pre-cached responses
+
+**JustWatch API** (via unofficial)
+- Purpose: Streaming availability
+- Fallback: Manual lookup message
+
+### 5.6 Security Considerations
+
+- [ ] Input validation on all endpoints (Zod)
+- [ ] bcrypt password hashing (12 rounds)
+- [ ] JWT with short expiry (15min access, 7day refresh)
+- [ ] HTTP-only cookies for refresh tokens
+- [ ] CORS whitelist configuration
+- [ ] Rate limiting on auth endpoints
+- [ ] Environment variables for secrets
+
+### 5.7 Performance Targets
+
+- **Frontend**: Lighthouse >90, FCP <1.5s
+- **Backend API**: p95 <200ms
+- **AI Response**: <3s for chat, <5s for recaps
+- **Database**: Indexed queries for user-specific data
 
 ---
 
-#### **Feature 3: Contextual Recap Generation**
-**User Story:** *"As a user, I need a quick recap of where I left off in a series, so I can jump back in without rewatching."*
-
-**Technical Requirements:**
-- **Input:** Series title + last watched episode from MongoDB
-- **Process:**
-  1. Retrieve episode summary from TMDB/OMDB API or web search
-  2. Use Google ADK's LLM to generate concise 3-5 sentence recap
-  3. Highlight key plot points and character developments
-- **Output:** Conversational recap (e.g., "When we last left off, Jon discovered the truth about his parentage...")
-
-**Template:**
-```
-Last time on [Show Name]:
-- Episode watched: S{season}E{episode} - "{Episode Title}"
-- Key events: {generated_summary}
-- What to watch for next: {teaser_hook}
-```
-
-**Success Metric:** Recap accuracy verified against episode wikis; <10 second generation time
-
-**Demo Impact:** User says "What happened in Stranger Things?" → instant, accurate recap
-
-**Build Effort:** 3 hours (API integration + prompt engineering + MongoDB query)
-
----
-
-#### **Feature 4: Interactive Character Quiz**
-**User Story:** *"As a user, I want fun quizzes about my favorite shows to deepen engagement beyond just tracking."*
-
-**Technical Requirements:**
-- **Quiz Types:**
-  1. **Character from Quote:** Display famous quote → user guesses character
-  2. **Show from Description:** Display plot summary → user guesses show
-  3. **Fun Facts:** Trivia about shows in user's history
-
-- **Data Source:** 
-  - Stored quotes/facts in MongoDB for watched shows
-  - Fallback: Generate quiz from show metadata using ADK's LLM
-
-**Example Flow:**
-```
-Agent: "Let's play! I'll give you a quote from a show you've watched.
-        Ready? 'Winter is coming.' Which character said this?"
-User: "Ned Stark"
-Agent: "Correct! 🎉 From Game of Thrones. Want another?"
-```
-
-**Success Metric:** 3+ quiz types implemented; smooth multi-turn interaction
-
-**Demo Impact:** Live quiz demonstration showing agent pulling from user's watch history
-
-**Build Effort:** 2 hours (quiz logic + response handling + scoring system)
-
----
-
-#### **Feature 5: Multi-Turn Conversation with Context**
-**User Story:** *"As a user, I need the agent to remember what we just talked about, so conversations feel natural."*
-
-**Technical Requirements:**
-- **Google ADK Session Management:**
-  - Maintain conversation state across turns
-  - Reference previous messages (e.g., "the show you just mentioned")
-  - Handle follow-up questions without re-explaining context
-
-**Example:**
-```
-User: "Recommend a thriller"
-Agent: "How about Mindhunter? FBI agents interview serial killers..."
-User: "Is it scary?"
-Agent: "Mindhunter is more psychological than horror—tense but not jump-scares."
-User: "OK, add it to my list"
-Agent: "Added Mindhunter to your watchlist! Want to start with Season 1?"
-```
-
-**Success Metric:** 5+ turn conversations without context loss
-
-**Demo Impact:** Show fluid 10-turn conversation where agent tracks pronouns and references
-
-**Build Effort:** 2 hours (ADK conversation design + state management)
-
----
-
-### 3.2 SHOULD-HAVE Features (Differentiators)
-
-#### **Feature 6: Mood-Based Discovery**
-- Natural language mood input: "I want something light and funny"
-- Map moods → genres → recommendations
-
-#### **Feature 7: Watch Progress Tracking**
-- "Mark episode as watched" command
-- Auto-increment to next episode in series
-
-#### **Feature 8: Social Sharing**
-- "What are my friends watching?" (if multi-user)
-- Export watchlist as shareable link
-
----
-
-### 3.3 COULD-HAVE Features (Polish)
-
-- Visual content cards with posters (if time permits)
-- Voice interaction (future enhancement)
-- Notification reminders for ongoing series
-
----
-
-### 3.4 WON'T-HAVE Features (Out of Scope)
-
-- Direct streaming integration (beyond scope)
-- User authentication/multi-user support (MVP is single-user)
-- Mobile app (web-based MVP only)
-- Paid API dependencies (MUST use free tiers)
-
----
-
-## 4. TECHNICAL ARCHITECTURE
-
-### 4.1 System Components
-```
-┌─────────────────────────────────────────────────────────┐
-│                    USER INTERFACE                        │
-│              (Web Chat Interface / CLI)                  │
-└───────────────────────┬─────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────┐
-│           GOOGLE AGENT DEVELOPMENT KIT (ADK)             │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │  Conversation Manager (Multi-turn Context)      │    │
-│  ├─────────────────────────────────────────────────┤    │
-│  │  Intent Router (Recommendation/Recap/Quiz)      │    │
-│  ├─────────────────────────────────────────────────┤    │
-│  │  Response Generator (LLM-powered)               │    │
-│  └─────────────────────────────────────────────────┘    │
-└───────────┬─────────────────────────┬───────────────────┘
-            │                         │
-            ▼                         ▼
-┌─────────────────────────┐  ┌──────────────────────────┐
-│    MONGODB ATLAS         │  │   EXTERNAL APIs          │
-│  (Memory Layer)          │  │  - TMDB (free tier)      │
-│  - User History          │  │  - OMDB (free tier)      │
-│  - Preferences           │  │  - Web Search Fallback   │
-│  - Quiz Data             │  │                          │
-└─────────────────────────┘  └──────────────────────────┘
-```
-
-### 4.2 Data Flow for Key Use Cases
-
-#### **Use Case 1: Get Recommendations**
-```
-1. User: "Recommend a sci-fi series"
-2. ADK Intent Router → Recommendation Handler
-3. Query MongoDB → Get user preferences & watch history
-4. Call TMDB API → Search sci-fi series (min_rating=7.0)
-5. Filter results → Remove watched/rejected titles
-6. Rank by relevance → Apply preference scoring
-7. ADK Response Generator → Format top 3 recommendations
-8. Return to user with synopsis and metadata
-```
-
-#### **Use Case 2: Get Recap**
-```
-1. User: "What happened in Breaking Bad?"
-2. ADK Intent Router → Recap Handler
-3. Query MongoDB → Get last watched episode (S5E14)
-4. Call TMDB API → Get episode summary
-5. ADK LLM → Generate conversational recap
-6. Return to user with "Last time on Breaking Bad..."
-```
-
-#### **Use Case 3: Interactive Quiz**
-```
-1. User: "Let's play a quiz"
-2. ADK Intent Router → Quiz Handler
-3. Query MongoDB → Get random watched show + character quotes
-4. ADK Response Generator → Format quiz question
-5. User answers → Validate response
-6. Track score → Store in session state
-7. Offer next question or end quiz
-```
-
----
-
-## 5. USER EXPERIENCE DESIGN
-
-### 5.1 User Journey Map
-
-#### **First-Time User Experience (FTUE)**
-**Goal:** Deliver value in <60 seconds
-```
-Entry Point: User opens chat interface
-    ↓
-First Message: "Hi! I'm your entertainment companion. 
-                Tell me about a show you recently loved!"
-    ↓
-User Input: "I loved Breaking Bad"
-    ↓ (15 seconds)
-Agent Action: Stores in MongoDB + Analyzes genre/actors
-    ↓
-Aha Moment: "Great choice! Since you loved Breaking Bad's 
-             intense crime drama, you might enjoy Better Call Saul 
-             or Ozark. Want more recommendations?"
-    ↓
-Activation: User says "Yes, more!" → First recommendation delivered
-    ↓
-Retention Hook: "I'll remember your taste. Chat anytime for 
-                 recommendations or recaps!"
-```
-
-**Time to Value:** ~45 seconds  
-**Drop-off Risk:** If agent asks too many setup questions → Solution: Learn passively through conversation
-
----
-
-#### **Core Use Case: Ongoing User**
-```
-1. User returns after watching 3 episodes of a series
-2. User: "What happened in The Last of Us?"
-3. Agent: Retrieves S1E3 from MongoDB → Generates recap
-4. User: "OK, what should I watch next?"
-5. Agent: Checks watch history → Suggests similar post-apocalyptic shows
-6. User: "Add The Walking Dead to my list"
-7. Agent: Updates MongoDB → Confirms addition
-```
-
----
-
-### 5.2 Conversation Design Principles
-
-**Tone & Voice:**
-- **Persona:** A knowledgeable friend who's excited about entertainment
-- **Tone:** Casual, enthusiastic, non-judgmental
-- **Voice:** Conversational, uses contractions, occasional pop culture references
-- **Pace:** Quick responses (<3 seconds), respects user's time
-
-**Example Interactions:**
-
-**❌ Bad (Robotic):**
-> "I have processed your request. Here are three recommendations based on your viewing history algorithm score."
-
-**✅ Good (Natural):**
-> "Ooh, based on your love for dark comedies, I think you'd dig Barry, Fleabag, and The End of the F***ing World. Want to know more about any of these?"
-
----
-
-### 5.3 Visual Design (If Web Interface)
-
-**Design System:**
-- **Primary Color:** #E50914 (Netflix red - familiar to users)
-- **Secondary Color:** #221F1F (Dark background for entertainment context)
-- **Accent Color:** #00D4FF (Bright cyan for CTAs and highlights)
-
-**Layout:**
-- Chat interface (left 60%): Conversation thread
-- Content cards (right 40%): Show posters, metadata, quick actions
-
-**Micro-Interactions:**
-- Typing indicator when agent is "thinking"
-- Subtle confetti animation when quiz answer is correct
-- Smooth card reveal for recommendations
-- "Added to list" checkmark animation
-
----
-
-## 6. SUCCESS METRICS & KPIs
+## 6. SUCCESS METRICS & ANALYTICS
 
 ### 6.1 Quantitative Metrics
 
-**User Engagement:**
-- Average conversation length: Target >5 turns
-- Feature usage: >60% users try recommendations, >30% try quiz
-- Return rate: Target >40% users return within 7 days
+**User Engagement**:
+- Activation Rate: >70% complete first recommendation interaction
+- Time to Value: <60 seconds
+- Chat Messages per Session: >5
+- Quiz Participation: 40% WAU
 
-**System Performance:**
-- Recommendation accuracy: 0% duplication with watch history
-- Recap generation time: <10 seconds
-- API response time: <2 seconds for recommendations
-- Database query time: <500ms
+**Feature Adoption**:
+- Recap Feature: 30% of returning users
+- Watchlist: Average 5+ items after week 1
+- Quiz Completion: 60% who start finish
 
-**Memory Accuracy:**
-- Recall test: Agent remembers 100% of explicitly mentioned shows
-- Preference learning: 80%+ recommendation acceptance rate after 5 interactions
+### 6.2 Analytics Events
 
-### 6.2 Qualitative Success Indicators
-
-**Judge Reactions (Demo):**
-- ✅ "This is actually useful—I need this!"
-- ✅ "The quiz feature is clever"
-- ✅ "I like that it doesn't repeat suggestions"
-- ✅ "The recaps are surprisingly accurate"
-
-**User Sentiment:**
-- "Finally, something that remembers what I've watched!"
-- "Way better than scrolling Netflix for 30 minutes"
-- "The quiz made me smile—nice touch"
+- `user_registered`
+- `first_chat_message`
+- `recommendation_viewed`
+- `content_added_to_history`
+- `recap_requested`
+- `quiz_started`
+- `quiz_completed`
+- `watchlist_item_added`
 
 ---
 
-## 7. EXECUTION PLAN (24-Hour Sprint)
+## 7. TESTING & QUALITY ASSURANCE
 
-### 7.1 Time-Boxed Development Schedule
-```
-HOUR 0-2: Setup & Architecture (10%)
-├─ Set up MongoDB Atlas (free tier)
-├─ Initialize Google ADK project
-├─ Configure TMDB API access
-├─ Create basic schema
-└─ Test connectivity
+### 7.1 Testing Strategy
 
-HOUR 2-8: Core Features Development (40%)
-├─ Feature 1: Viewing History CRUD (2 hrs)
-├─ Feature 2: Recommendation Engine (3 hrs)
-└─ Feature 3: Recap Generation (1 hr)
+**Unit Tests**:
+- API endpoint validation
+- Database model methods
+- Utility functions
 
-HOUR 8-12: Interactive Features (25%)
-├─ Feature 4: Quiz System (2 hrs)
-├─ Feature 5: Multi-turn Context (2 hrs)
+**Integration Tests**:
+- Auth flow end-to-end
+- Chat → AI service → response
+- History CRUD operations
 
-HOUR 12-16: Integration & Testing (15%)
-├─ End-to-end flow testing
-├─ Error handling
-├─ Edge case fixes
-└─ Performance optimization
+**E2E Tests** (Playwright):
+- User registration → first recommendation
+- Adding to watchlist → verifying persistence
+- Quiz complete flow
 
-HOUR 16-20: UI/UX Polish (10%)
-├─ Conversation flow refinement
-├─ Response formatting
-├─ Visual elements (if web UI)
-└─ Demo data population
+### 7.2 Manual Testing Checklist
 
-HOUR 20-24: Demo Preparation (10%)
-├─ Write demo script
-├─ Rehearse 3x
-├─ Create backup video
-├─ Prepare Q&A responses
-└─ Final testing
-
-Checkpoints:
-✓ Hour 8: Can recommend shows without duplication?
-✓ Hour 12: Can generate accurate recaps?
-✓ Hour 16: Does multi-turn conversation work?
-✓ Hour 20: Is demo flow stable?
-```
-
-### 7.2 Risk Mitigation
-
-| Risk | Likelihood | Impact | Mitigation | Contingency |
-|------|-----------|--------|------------|-------------|
-| TMDB API rate limits | Medium | High | Cache responses, use OMDB fallback | Pre-load demo data in MongoDB |
-| ADK complexity | Medium | High | Start with simple intents | Use basic Flask chatbot if ADK fails |
-| MongoDB connection issues | Low | Critical | Use Atlas free tier with uptime SLA | Switch to SQLite local DB |
-| Recap generation accuracy | Medium | Medium | Test with popular shows, refine prompts | Allow manual recap editing |
-| Time overrun | High | Critical | Ruthlessly cut "nice-to-have" features | Demo with 3 core features only |
+- [ ] Test all auth flows (register, login, logout, token refresh)
+- [ ] Verify chat responses are contextual
+- [ ] Confirm history updates reflect in recommendations
+- [ ] Test mobile responsiveness at 375px, 768px, 1024px
+- [ ] Verify accessibility with screen reader
 
 ---
 
-## 8. DEMONSTRATION STRATEGY
+## 8. PROJECT TIMELINE (24-Hour Build)
 
-### 8.1 Demo Script (15 minutes)
-
-**Act 1: Problem Setup (2 min)**
-> "Let me show you something. Raise your hand if you've ever spent 20 minutes scrolling Netflix just to rewatch The Office again because you couldn't decide what's new."
->
-> [Show statistic: Average person spends 18 minutes per day choosing what to watch]
->
-> "What if you had a friend who remembered everything you've watched, never suggested the same thing twice, and could remind you where you left off? That's what we built."
-
-**Act 2: Live Demo (10 min)**
-
-**Demo Flow 1: First Interaction**
-```
-Presenter: "Let me introduce the agent. Watch this."
-
-[Types]: "I just finished watching The Bear"
-
-Agent: "Great choice! The Bear is intense. I'll remember that you 
-        enjoy high-stakes kitchen dramas. Want recommendations 
-        based on that?"
-
-[Types]: "Yes, something similar"
-
-Agent: "How about Boiling Point (single-take restaurant thriller) 
-        or The Menu (dark culinary satire)? Both match that 
-        high-pressure cooking vibe. Or if you want to explore 
-        more character-driven drama, try Succession."
-
-Presenter: "Notice—it learned my preference instantly and gave 
-            specific reasons why each show matches."
-```
-
-**Demo Flow 2: Memory & Recaps**
-```
-[Types]: "What was happening in Succession? I stopped mid-season 3"
-
-Agent: "Last time on Succession: Kendall's shareholder meeting 
-        backfired, Logan announced he's selling Waystar to Matsson, 
-        and Shiv is secretly negotiating her own deal. Things are 
-        about to explode in the next episode!"
-
-Presenter: "It remembered I was watching it AND gave me context 
-            without spoiling what's ahead. Now watch this..."
-
-[Types]: "Recommend something, but not Succession"
-
-Agent: "Got it—adding Succession to your 'seen it' list. How about 
-        Yellowstone for family power dynamics or Billions for 
-        corporate warfare?"
-
-Presenter: "It filtered out what I just mentioned. No repetition."
-```
-
-**Demo Flow 3: Interactive Quiz**
-```
-[Types]: "Let's play a quiz"
-
-Agent: "Fun! Here's a quote from a show you've watched: 
-        'I am the one who knocks.' Who said it?"
-
-[Types]: "Walter White"
-
-Agent: "Correct! 🎉 From Breaking Bad. Another one? 
-        'That's what she said.' Too easy?"
-
-[Types]: "Michael Scott"
-
-Agent: "You know your shows! Want to keep going or explore 
-        new recommendations?"
-Act 3: Vision & Impact (2 min)
-
-"This is more than a tracker. It's a companion that learns, remembers, and enhances how you experience entertainment. Imagine scaling this to:
-
-Group watch parties: 'What should our friend group watch tonight?'
-Learning applications: 'Quiz me on historical documentaries I've seen'
-Content discovery: 'Find hidden gems in genres I didn't know I'd love'
-
-The foundation is here, and it's built on open technology anyone can extend."
-
-Act 4: Q&A Prep (3 min buffer)
-
-8.2 Anticipated Questions & Answers
-Q: How is this different from Netflix's recommendation system?
-A: Netflix uses collaborative filtering (what similar users watched). We use explicit memory and user-stated preferences, which means we can explain why we recommend something and avoid showing you the same suggestions repeatedly. Plus, we're platform-agnostic—works for anything you watch.
-Q: Can this scale to multiple users?
-A: Absolutely. The architecture is designed with user_id as a primary key. For the MVP, we focused on single-user experience to perfect the core features, but multi-user is just a schema extension away.
-Q: What if the API doesn't have a show?
-A: We have a fallback chain: TMDB → OMDB → Web search scraping. For the demo, we focused on popular content that's well-indexed, but the system gracefully handles missing data.
-Q: How do you prevent hallucinations in recaps?
-A: We ground the LLM's generation in actual episode summaries from APIs. We're not asking it to "remember" the show—we're asking it to "summarize this text conversationally," which is a much more reliable use case.
-Q: Is the quiz data manually entered?
-A: For the MVP, we seeded 50+ quotes/facts from popular shows. For production, we'd generate quizzes dynamically using the LLM based on show metadata, or crowdsource from fan wikis.
-
-9. JUDGING CRITERIA OPTIMIZATION
-Innovation (25%)
-Our Edge:
-
-Memory-augmented agent architecture (not just stateless chatbot)
-Anti-repetition filtering (novel approach to recommendations)
-Interactive quiz integration (unique in entertainment tracking)
-
-Talking Points:
-
-"Most AI assistants forget what you told them. We built persistent memory into the core architecture, so every conversation makes the agent smarter about your taste."
-
-Creativity (20%)
-Our Edge:
-
-Quiz feature adds gamification to tracking
-Conversational recap style (vs. dry summaries)
-Mood-based discovery ("I want something cozy")
-
-Talking Points:
-
-"We didn't just build a database with a chat interface. We asked: how do we make tracking fun? The quiz feature turns your watch history into an interactive experience."
-
-Presentation/UI (20%)
-Our Edge:
-
-Clean, distraction-free chat interface
-Visual content cards (if implemented)
-Smooth animations and feedback
-
-Talking Points:
-
-"Entertainment should feel entertaining. Every interaction is designed to feel effortless—from the moment you mention a show to the moment you get a perfect recommendation."
-
-Usability/UX (20%)
-Our Edge:
-
-Zero-setup onboarding (start chatting immediately)
-Natural language input (no rigid commands)
-Context-aware conversations (no repetitive questions)
-
-Talking Points:
-
-"You don't need to fill out a profile or rate 50 shows. Just talk naturally, and the agent learns as you go. Value in under 60 seconds."
-
-Impact/Benefits (15%)
-Our Edge:
-
-Time saved: Average 18 min/day decision paralysis → <2 min with agent
-Enhanced experience: Never lose track of ongoing series
-Measurable outcomes: X shows tracked, Y recommendations accepted
-
-Talking Points:
-
-"Students waste hours per week on 'what should I watch?' We give them that time back while making entertainment discovery more personalized than any streaming platform."
-
-
-10. POST-DEMO MOMENTUM
-10.1 If We Win
-
- Deploy live demo at [moviecompanion.app]
- Create demo video for social media
- Write Medium article: "Building an AI Entertainment Companion in 24 Hours"
- Submit to Product Hunt
- Open-source the core framework on GitHub
-
-10.2 If We Don't Win
-
- Collect judge feedback for iteration
- Launch anyway on Reddit (r/television, r/movies)
- Refine based on real user testing
- Explore monetization (premium features, API access)
-
-
-11. APPENDIX: TECHNICAL SPECIFICATIONS
-11.1 MongoDB Schema (Detailed)
-javascript// users collection
-{
-  _id: ObjectId,
-  user_id: String (unique),
-  created_at: ISODate,
-  watched_shows: [
-    {
-      show_id: String, // from TMDB
-      title: String,
-      type: "movie" | "series",
-      status: "completed" | "ongoing" | "dropped" | "watchlist",
-      last_watched: {
-        season: Number,
-        episode: Number,
-        date: ISODate
-      },
-      rating: Number, // 1-5
-      tags: [String], // user-generated or inferred
-      notes: String,
-      added_date: ISODate
-    }
-  ],
-  preferences: {
-    liked_genres: [String],
-    disliked_genres: [String],
-    favorite_actors: [String],
-    content_preferences: {
-      max_runtime: Number, // minutes
-      subtitle_tolerance: Boolean,
-      language_preferences: [String],
-      avoid_keywords: [String] // "horror", "gore", etc.
-    }
-  },
-  rejected_suggestions: [
-    {
-      title: String,
-      reason: String, // "not interested", "already watched", etc.
-      date: ISODate
-    }
-  ],
-  quiz_stats: {
-    total_questions: Number,
-    correct_answers: Number,
-    favorite_quiz_type: String
-  }
-}
-
-// conversation_sessions collection (for multi-turn context)
-{
-  _id: ObjectId,
-  user_id: String,
-  session_id: String,
-  started_at: ISODate,
-  last_active: ISODate,
-  messages: [
-    {
-      role: "user" | "agent",
-      content: String,
-      timestamp: ISODate,
-      metadata: Object // intent, entities, etc.
-    }
-  ],
-  context: {
-    current_topic: String, // "recommendation", "recap", "quiz"
-    mentioned_shows: [String],
-    active_quiz: Object // quiz state if in progress
-  }
-}
-```
-
-### 11.2 API Endpoints (If Building REST API)
-```
-GET  /api/user/:user_id/history
-POST /api/user/:user_id/add-show
-GET  /api/user/:user_id/recommendations?genre=sci-fi&mood=dark
-GET  /api/show/:show_id/recap?episode=S01E05
-POST /api/quiz/start?user_id=123
-POST /api/quiz/answer
-GET  /api/user/:user_id/stats
-11.3 Environment Variables
-bash# MongoDB
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/moviecompanion
-MONGODB_DATABASE=moviecompanion
-
-# TMDB API
-TMDB_API_KEY=your_tmdb_api_key
-TMDB_BASE_URL=https://api.themoviedb.org/3
-
-# OMDB API (Fallback)
-OMDB_API_KEY=your_omdb_api_key
-OMDB_BASE_URL=http://www.omdbapi.com
-
-# Google ADK
-GOOGLE_ADK_PROJECT_ID=your_project_id
-GOOGLE_ADK_SERVICE_ACCOUNT=path/to/service-account.json
-
-# Application
-PORT=8080
-ENV=development
-LOG_LEVEL=debug
-```
+| Phase | Duration | Deliverables |
+|-------|----------|--------------|
+| Setup | 2 hours | Project scaffolding, database, auth |
+| Core Backend | 4 hours | APIs for history, watchlist, content |
+| AI Service | 4 hours | Chat, recommendations, recaps |
+| Frontend Shell | 4 hours | Layout, navigation, auth pages |
+| Chat Interface | 4 hours | Main chat UI with AI integration |
+| History & Watchlist | 3 hours | Dashboard pages |
+| Polish & Testing | 3 hours | Animations, error handling, testing |
 
 ---
 
-## 12. CLOSING CHECKLIST
+## 9. FUTURE ROADMAP
 
-### Pre-Development ✅
-- [x] PRD reviewed and approved
-- [ ] Technology stack confirmed (Google ADK + MongoDB + TMDB)
-- [ ] MongoDB Atlas account created
-- [ ] TMDB API key obtained
-- [ ] Google ADK credentials configured
-- [ ] Development environment tested
+### Phase 2 (Month 1-2)
+- Mobile-optimized PWA
+- Enhanced quiz modes
+- Social sharing
 
-### During Development 🚧
-- [ ] Hour 2: MongoDB schema implemented
-- [ ] Hour 4: Recommendation engine working
-- [ ] Hour 8: Core features integrated
-- [ ] Hour 12: Quiz feature functional
-- [ ] Hour 16: End-to-end flow tested
-- [ ] Hour 20: Demo script finalized
+### Phase 3 (Month 3-6)
+- Multi-user profiles
+- Community recommendations
+- Native mobile apps
 
-### Demo Day 🎤
-- [ ] Backup video recorded
-- [ ] Demo account with seed data ready
-- [ ] Presentation slides prepared
-- [ ] Team roles assigned (presenter, operator, Q&A)
-- [ ] Contingency plans reviewed
-
----
-
-## 13. FINAL MANTRA
-```
-"Remember everything.
-Recommend perfectly.
-Engage delightfully.
-Win decisively."
+### Phase 4 (Month 6+)
+- Voice interface
+- Calendar integration
+- API for third-party apps
