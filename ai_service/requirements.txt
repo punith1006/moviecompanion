@@ -1,0 +1,31 @@
+# ReelMind AI Service Dependencies
+# Python 3.10+ required
+
+# FastAPI Framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
+
+# Google ADK (Agent Development Kit)
+google-adk>=0.2.0
+
+# OpenAI SDK
+openai>=1.35.0
+
+# LiteLLM for model flexibility
+litellm>=1.40.0
+
+# Tavily for web search
+tavily-python>=0.3.3
+
+# TMDB API
+httpx>=0.27.0
+aiohttp>=3.9.0
+
+# Database
+motor>=3.4.0  # Async MongoDB driver
+
+# Utilities
+python-dotenv>=1.0.1
+python-jose[cryptography]>=3.3.0

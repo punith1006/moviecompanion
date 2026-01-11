@@ -1,0 +1,824 @@
+# PHASE 0: PROBLEM STATEMENT DECONSTRUCTION (15-30 min)
+
+---
+
+### **Step 0.1: Deep Reading & Annotation**
+
+Read the problem statement **3 times**:
+
+1. **First pass**: Skim for general understanding
+2. **Second pass**: Highlight key terms, constraints, and requirements
+3. **Third pass**: Identify hidden expectations and evaluation criteria
+
+### **Step 0.2: Extract Core Components**
+
+Create a structured breakdown:
+
+```markdown
+## PROBLEM DECOMPOSITION TEMPLATE
+
+### Explicit Requirements
+- [ ] What MUST be built? (non-negotiable features)
+- [ ] What technologies are mandated?
+- [ ] What constraints exist? (time, tech stack, scope)
+- [ ] What data sources are specified?
+
+### Implicit Expectations
+- [ ] What's the END USER persona?
+- [ ] What's the CORE PAIN POINT?
+- [ ] What EXPERIENCE are they expecting?
+- [ ] What would make judges say "WOW"?
+
+### Success Criteria (from problem statement)
+- [ ] Innovation: _______
+- [ ] Creativity: _______
+- [ ] Presentation/UI: _______
+- [ ] Usability/UX: _______
+- [ ] Impact/Benefits: _______
+- [ ] Technical Complexity: _______
+
+### Red Flags & Constraints
+- [ ] What could disqualify us?
+- [ ] What's explicitly forbidden?
+- [ ] What assumptions are dangerous?
+
+```
+
+### **Step 0.3: Identify the Problem "Type"**
+
+Categorize the problem to activate appropriate mental models:
+
+| **Type** | **Indicators** | **Focus Areas** |
+| --- | --- | --- |
+| **Data-Driven** | "analytics", "insights", "dashboard" | Visualization, ML, data pipeline |
+| **Automation** | "streamline", "automate", "efficiency" | Workflow, integration, time-saving |
+| **Consumer App** | "students", "users", "experience" | UX, engagement, delight factors |
+| **Enterprise Tool** | "business", "productivity", "teams" | Reliability, scalability, ROI |
+| **Social Impact** | "community", "sustainability", "access" | Impact metrics, storytelling, ethics |
+| **Technical Challenge** | "algorithm", "optimize", "performance" | Benchmarks, complexity, innovation |
+
+---
+
+## 🔍 PHASE 1: CONTEXTUAL INTELLIGENCE GATHERING (30-60 min)
+
+### **Step 1.1: Market Landscape Research**
+
+```markdown
+## MARKET RESEARCH CHECKLIST
+
+### Existing Solutions Audit
+- [ ] Search: "[problem domain] apps 2024"
+- [ ] Search: "[problem domain] startups funding"
+- [ ] Search: "[problem domain] open source tools"
+- [ ] Document: Top 5 competitors and their features
+
+### User Pain Points Investigation
+- [ ] Search: "[solution type] user complaints Reddit"
+- [ ] Search: "[solution type] reviews pain points"
+- [ ] Search: "[target persona] problems [domain]"
+- [ ] Document: Top 10 recurring complaints
+
+### Market Size & Opportunity
+- [ ] Search: "[industry] market size 2025"
+- [ ] Search: "[industry] trends report"
+- [ ] Document: TAM, growth rate, key drivers
+
+### Technology Landscape
+- [ ] Search: "[mandated tech] best practices 2025"
+- [ ] Search: "[mandated tech] tutorial examples"
+- [ ] Search: "[mandated tech] limitations known issues"
+- [ ] Document: Technical feasibility and risks
+
+```
+
+### **Step 1.2: Hidden Opportunities Mining**
+
+Use this framework to uncover what others miss:
+
+```markdown
+## OPPORTUNITY DISCOVERY MATRIX
+
+### Jobs-to-be-Done Analysis
+- What is the user REALLY trying to accomplish?
+- What's the deeper motivation behind the surface request?
+- What adjacent problems exist in the same workflow?
+
+### Friction Point Mapping
+- Where do users currently experience delays?
+- What manual steps can be eliminated?
+- What cognitive load can be reduced?
+
+### Emotional Triggers Identification
+- What makes users frustrated? (pain avoidance)
+- What makes users delighted? (pleasure seeking)
+- What social/status needs exist? (tribal belonging)
+
+### Underserved Segments
+- Who is ignored by existing solutions?
+- What edge cases are dismissed as "too niche"?
+- What accessibility needs are overlooked?
+
+### Technology Unlock Opportunities
+- What's now possible that wasn't 6 months ago?
+- How can emerging tech create 10x better experience?
+- What integrations haven't been tried?
+
+```
+
+### **Step 1.3: Competitive Differentiation Analysis**
+
+```markdown
+## COMPETITIVE GAP ANALYSIS
+
+For each major competitor, document:
+- ✅ What they do WELL
+- ❌ What users COMPLAIN about
+- 🔒 What they CHARGE for
+- 🎯 What they IGNORE
+
+Then identify:
+- 🚀 Blue Ocean Opportunities (uncontested space)
+- ⚡ 10x Improvement Vectors (dramatically better on one dimension)
+- 🎁 Trojan Horse Features (unexpected delight)
+
+```
+
+---
+
+## 💡 PHASE 2: INNOVATION IDEATION (45-90 min)
+
+### **Step 2.1: Divergent Thinking Session**
+
+Generate 20+ ideas using structured prompts:
+
+```markdown
+## IDEA GENERATION PROMPTS
+
+### Inversion Thinking
+- What if we did the OPPOSITE of standard approaches?
+- What if we removed the most "essential" feature?
+
+### Constraint Removal
+- What if cost wasn't a concern?
+- What if we had perfect data?
+- What if users were experts?
+
+### Cross-Domain Inspiration
+- How does [different industry] solve similar problems?
+- What if we applied [gaming/social media/finance] mechanics?
+
+### Technology Forcing
+- How would we solve this with [AI/VR/blockchain/voice]?
+- What if the interface was [invisible/ambient/wearable]?
+
+### User Transformation
+- What if the user was [10 years old / 80 years old / expert]?
+- What if they were using this [in a car / in bed / while cooking]?
+
+### Extreme Scenarios
+- What if we had to deliver value in 30 seconds?
+- What if we could only use 3 screens?
+- What if the user was offline?
+
+```
+
+### **Step 2.2: Convergent Filtering**
+
+Score each idea on the **DICE Framework**:
+
+```markdown
+## DICE SCORING (1-10 scale)
+
+D - Differentiation
+- How unique is this compared to existing solutions?
+
+I - Impact
+- How significantly does this improve the user's life?
+
+C - Credibility
+- Can we actually build this in the timeframe?
+
+E - Excitement
+- Will judges/users say "I need this NOW"?
+
+TOTAL SCORE: ___ / 40
+
+✅ Score 30+: Core feature
+⚠️ Score 20-29: Nice-to-have
+❌ Score <20: Cut or defer
+
+```
+
+### **Step 2.3: Innovation Thesis Formulation**
+
+Articulate your unique insight in one sentence:
+
+```markdown
+## INNOVATION THESIS TEMPLATE
+
+"While everyone else is building [CONVENTIONAL APPROACH],
+we realized that users actually need [INSIGHT],
+so we're creating [UNIQUE SOLUTION],
+which delivers [SPECIFIC BENEFIT]
+in a way that's [DIFFERENTIATOR]."
+
+Example:
+"While everyone else is building meal planning apps that require
+extensive manual input, we realized that users actually need
+instant value with zero effort, so we're creating a photo-based
+pantry assistant with AI personality, which delivers personalized
+recipes in 10 seconds in a way that's emotionally engaging and fun."
+
+```
+
+---
+
+## 🏗️ PHASE 3: FEATURE ARCHITECTURE (60-90 min)
+
+### **Step 3.1: Feature Prioritization Matrix**
+
+Use the **MoSCoW + Impact Framework**:
+
+```markdown
+## FEATURE CLASSIFICATION
+
+### MUST-HAVE (MVP Core)
+These features define the product's existence.
+Criteria: Without this, the solution doesn't work.
+
+Format:
+- Feature Name
+  - User Story: "As a [persona], I need [capability] so that [outcome]"
+  - Success Metric: [measurable outcome]
+  - Demo Impact: [how it impresses judges]
+  - Build Effort: [hours estimate]
+
+### SHOULD-HAVE (Differentiators)
+These features set you apart from competitors.
+Criteria: This makes us meaningfully better.
+
+### COULD-HAVE (Polish)
+These features enhance but don't define.
+Criteria: This adds delight but isn't critical.
+
+### WON'T-HAVE (Future Roadmap)
+These features are good ideas for later.
+Criteria: Out of scope but shows vision.
+
+```
+
+### **Step 3.2: User Journey Mapping**
+
+```markdown
+## CRITICAL USER FLOWS
+
+### Flow 1: First-Time User Experience (FTUE)
+Goal: Value delivered in < 60 seconds
+
+1. Entry Point: [how user arrives]
+2. First Interaction: [first thing they do]
+3. Aha Moment: [when value clicks]
+4. Activation: [committed action]
+5. Retention Hook: [why they return]
+
+Time budget: ___ seconds
+Drop-off risks: [list potential friction]
+
+### Flow 2: Core Use Case
+[Repeat structure for main workflows]
+
+### Flow 3: Power User Flow
+[Advanced features for engaged users]
+
+```
+
+### **Step 3.3: Technical Dependency Mapping**
+
+```markdown
+## TECHNICAL ARCHITECTURE
+
+### System Components
+- Frontend: [technology + justification]
+- Backend: [technology + justification]
+- Database: [technology + justification]
+- AI/ML: [technology + justification]
+- APIs: [external services needed]
+
+### Integration Points
+- [ ] Component A ↔ Component B: [data flow]
+- [ ] Component B ↔ Component C: [data flow]
+
+### Critical Path Analysis
+What MUST work for the demo?
+1. [Essential function 1]
+2. [Essential function 2]
+3. [Essential function 3]
+
+### Fallback Plans
+If [Component X] fails → [Backup strategy]
+
+```
+
+---
+
+## 🎨 PHASE 4: EXPERIENCE DESIGN (45-60 min)
+
+### **Step 4.1: Emotional Design Framework**
+
+```markdown
+## EMOTIONAL JOURNEY DESIGN
+
+### Core Emotion Goal
+What should users FEEL when using this?
+- Primary: [e.g., empowered, delighted, relieved]
+- Secondary: [supporting emotions]
+- Avoid: [negative emotions to prevent]
+
+### Personality Definition
+If this product was a person, they would be:
+- Tone: [professional/casual/playful/authoritative]
+- Voice: [formal/conversational/technical/friendly]
+- Pace: [fast/methodical/patient]
+- Humor: [witty/silly/dry/none]
+
+### Micro-Interaction Catalog
+Small moments that create delight:
+- [ ] Loading states: [creative spinner idea]
+- [ ] Success confirmations: [celebration animation]
+- [ ] Error handling: [helpful + human]
+- [ ] Empty states: [encouraging message]
+- [ ] Transitions: [smooth motion design]
+
+```
+
+### **Step 4.2: Visual Identity Sprint**
+
+```markdown
+## DESIGN SYSTEM ESSENTIALS
+
+### Color Psychology
+Primary Color: [hex] - Represents [emotion/value]
+Secondary Color: [hex] - Represents [emotion/value]
+Accent Color: [hex] - For [calls-to-action]
+
+### Typography Hierarchy
+Headlines: [font] - For [impact/clarity]
+Body: [font] - For [readability]
+UI Elements: [font] - For [functionality]
+
+### Visual Metaphors
+What real-world objects inspire the design?
+- [Metaphor 1]: Because it conveys [concept]
+- [Metaphor 2]: Because it conveys [concept]
+
+### Competitive Visual Differentiation
+- Competitor A looks: [description]
+- Competitor B looks: [description]
+- We look: [unique direction]
+
+```
+
+### **Step 4.3: Accessibility & Inclusivity Checklist**
+
+```markdown
+## INCLUSIVE DESIGN
+
+- [ ] Color contrast meets WCAG AA standards
+- [ ] Keyboard navigation works for all interactions
+- [ ] Screen reader compatible
+- [ ] Error messages are clear and actionable
+- [ ] Works on low-end devices/connections
+- [ ] Supports multiple languages (if applicable)
+- [ ] No flashing animations (seizure risk)
+- [ ] Readable fonts (min 14px)
+
+```
+
+---
+
+## 📊 PHASE 5: SUCCESS METRICS DEFINITION (30 min)
+
+### **Step 5.1: Quantitative Metrics**
+
+```markdown
+## MEASURABLE IMPACT FRAMEWORK
+
+### User Metrics
+- Activation Rate: [% who complete first action]
+- Time to Value: [seconds until first benefit]
+- Engagement: [actions per session]
+- Retention: [% returning users]
+
+### Business Metrics (if applicable)
+- Cost Savings: [$X saved per user]
+- Time Savings: [Y hours saved per week]
+- Efficiency Gain: [Z% improvement]
+
+### Technical Metrics
+- Response Time: [< X seconds]
+- Accuracy: [Y% correct predictions]
+- Uptime: [Z% availability]
+
+### Impact Metrics (Social Good)
+- Lives Improved: [# of people helped]
+- Resources Saved: [environmental impact]
+- Problems Solved: [scale of benefit]
+
+```
+
+### **Step 5.2: Qualitative Indicators**
+
+```markdown
+## EXPERIENCE QUALITY SIGNALS
+
+### Judge Reactions (during demo)
+- [ ] Leaning forward (engaged)
+- [ ] Nodding (understanding)
+- [ ] Smiling (delighted)
+- [ ] Asking questions (curious)
+- [ ] Taking notes (impressed)
+
+### User Sentiment (if user testing)
+- "This is exactly what I needed!"
+- "Why doesn't this exist already?"
+- "Where can I download this?"
+- "This is so much better than [competitor]"
+
+### Sharability Test
+Would users screenshot and share this?
+Would they tell friends about it?
+
+```
+
+---
+
+## ⚡ PHASE 6: EXECUTION PLANNING (30-45 min)
+
+### **Step 6.1: Time-Boxed Sprint Plan**
+
+```markdown
+## HACKATHON TIMELINE (adjust to your duration)
+
+### Setup Phase (10% of time)
+- [ ] Development environment configured
+- [ ] GitHub repo created + CI/CD
+- [ ] Team roles assigned
+- [ ] Communication channels set up
+- [ ] Design assets prepared
+
+### Building Phase (60% of time)
+
+#### Sprint 1: Foundation (25%)
+- [ ] Core data models
+- [ ] Basic API scaffolding
+- [ ] UI framework + routing
+- [ ] Authentication (if needed)
+CHECKPOINT: Can we navigate between screens?
+
+#### Sprint 2: Core Features (50%)
+- [ ] Feature 1 (highest priority)
+- [ ] Feature 2 (second priority)
+- [ ] Feature 3 (differentiator)
+CHECKPOINT: Does the main flow work end-to-end?
+
+#### Sprint 3: Integration (75%)
+- [ ] Connect all components
+- [ ] Data flows tested
+- [ ] Error handling added
+CHECKPOINT: Is it stable enough to demo?
+
+### Polish Phase (20% of time)
+- [ ] UI refinements
+- [ ] Animations added
+- [ ] Copy/content polished
+- [ ] Demo data populated
+- [ ] Bug fixes
+
+### Rehearsal Phase (10% of time)
+- [ ] Demo script written
+- [ ] Presentation rehearsed 3x
+- [ ] Backup video recorded
+- [ ] Q&A preparation
+- [ ] Team coordination finalized
+
+```
+
+### **Step 6.2: Risk Mitigation Strategy**
+
+```markdown
+## FAILURE MODE ANALYSIS
+
+For each critical component, define:
+
+### Risk: [What could go wrong]
+- Likelihood: [High/Medium/Low]
+- Impact: [Critical/Major/Minor]
+- Mitigation: [How to prevent]
+- Contingency: [Plan B if it happens]
+
+Example:
+### Risk: API rate limits exceeded during demo
+- Likelihood: Medium
+- Impact: Critical (demo breaks)
+- Mitigation: Cache all responses, use mock data toggle
+- Contingency: Switch to pre-recorded video walkthrough
+
+```
+
+### **Step 6.3: Parallel Workstream Allocation**
+
+```markdown
+## TEAM DIVISION OF LABOR
+
+### Workstream A: [Component Name]
+Owner: [Name]
+Dependencies: [What needs to be ready first]
+Deliverable: [Specific output]
+Deadline: [Hour X]
+
+### Workstream B: [Component Name]
+Owner: [Name]
+Dependencies: [What needs to be ready first]
+Deliverable: [Specific output]
+Deadline: [Hour X]
+
+### Integration Points
+- Hour [X]: Team sync to connect components
+- Hour [Y]: Full integration test
+- Hour [Z]: Final stability check
+
+```
+
+---
+
+## 🎤 PHASE 7: PRESENTATION ARCHITECTURE (30-45 min)
+
+### **Step 7.1: Story Structure Design**
+
+Use the **"Hero's Journey for Products"** framework:
+
+```markdown
+## PRESENTATION NARRATIVE ARC
+
+### Act 1: The Ordinary World (2 min)
+- Open with relatable problem scenario
+- Establish emotional connection
+- Show current pain/frustration
+- HOOK: Surprising statistic or question
+
+### Act 2: Call to Adventure (2 min)
+- "What if there was a better way?"
+- Introduce your insight/thesis
+- Show vision of transformed experience
+- TRANSITION: "Let me show you..."
+
+### Act 3: The Journey (10-12 min)
+🎬 LIVE DEMO (primary focus)
+- Flow 1: First-time user magic moment
+- Flow 2: Core use case walkthrough
+- Flow 3: "And here's the cool part..." (differentiator)
+- Highlight: Impact metrics in real-time
+
+### Act 4: Return with the Elixir (2-3 min)
+- Summarize transformation enabled
+- Show scalability/vision
+- Present impact metrics
+- Market opportunity (if relevant)
+
+### Act 5: Q&A (5 min)
+- Anticipated questions prepared
+- Technical deep-dives ready
+- Competitor comparison ready
+- Future roadmap articulated
+
+```
+
+### **Step 7.2: Demo Flow Choreography**
+
+```markdown
+## DEMO SCRIPT CHECKLIST
+
+### Pre-Demo Setup
+- [ ] Demo account pre-populated with perfect data
+- [ ] Browser tabs pre-loaded
+- [ ] Screen resolution optimized (1920x1080)
+- [ ] Notifications disabled
+- [ ] Backup device ready
+
+### Demo Execution
+- [ ] Start with blank slate OR pre-populated state?
+- [ ] Narrate intentions: "Now I'm going to..."
+- [ ] Point out subtle details: "Notice how..."
+- [ ] Build anticipation: "Watch what happens when..."
+- [ ] Show, don't tell: Let the product speak
+
+### Demo Recovery Plans
+If live demo fails:
+- OPTION 1: Pre-recorded video (same narration)
+- OPTION 2: Slideshow with screenshots
+- OPTION 3: Code walkthrough (technical audience)
+
+### Timing Markers
+- 0:00 - Problem statement
+- 2:00 - Solution introduction
+- 4:00 - Demo begins
+- 14:00 - Demo concludes
+- 15:00 - Vision/roadmap
+- 17:00 - Q&A buffer
+
+```
+
+### **Step 7.3: Visual Aid Preparation**
+
+```markdown
+## PRESENTATION MATERIALS
+
+### Slide Deck Structure (if using slides)
+1. Title: Product name + tagline
+2. Problem: Emotional hook with data
+3. Solution: Your innovation thesis
+4. [DEMO SECTION - no slides, live product]
+5. Impact: Metrics + testimonials
+6. Vision: Roadmap + market opportunity
+7. Team: (if required)
+8. Thank You + Contact
+
+Design Principles:
+- One idea per slide
+- Visuals > Text (images, diagrams, screenshots)
+- Large fonts (32pt minimum)
+- High contrast colors
+- Consistent branding
+
+### Supporting Materials
+- [ ] One-pager handout (for judges)
+- [ ] QR code to live demo/website
+- [ ] GitHub repo link (if open source)
+- [ ] Video demo (backup + social sharing)
+
+```
+
+---
+
+## 🏆 PHASE 8: JUDGING OPTIMIZATION (20-30 min)
+
+### **Step 8.1: Criteria Alignment Matrix**
+
+Map features to judging criteria:
+
+```markdown
+## SCORING OPTIMIZATION
+
+### Innovation (Weight: X%)
+Features that demonstrate:
+- [ ] [Feature A]: Novel approach to [problem]
+- [ ] [Feature B]: Unique use of [technology]
+- [ ] [Feature C]: Unprecedented [capability]
+Talking points: [How to highlight innovation]
+
+### Creativity (Weight: X%)
+Features that demonstrate:
+- [ ] [Feature D]: Unexpected [delight factor]
+- [ ] [Feature E]: Beautiful [design element]
+- [ ] [Feature F]: Clever [interaction pattern]
+Talking points: [How to highlight creativity]
+
+### Presentation/UI (Weight: X%)
+Elements that demonstrate:
+- [ ] Visual polish: [specific examples]
+- [ ] Intuitive design: [specific examples]
+- [ ] Attention to detail: [specific examples]
+Talking points: [How to highlight design]
+
+### Usability/UX (Weight: X%)
+Features that demonstrate:
+- [ ] Ease of use: [how quickly users get value]
+- [ ] Clear flows: [how intuitive navigation is]
+- [ ] Error prevention: [how we guide users]
+Talking points: [How to highlight usability]
+
+### Impact/Benefits (Weight: X%)
+Metrics that demonstrate:
+- [ ] User impact: [lives improved, time saved]
+- [ ] Scale potential: [market size, reach]
+- [ ] Real-world validation: [evidence of need]
+Talking points: [How to highlight impact]
+
+```
+
+### **Step 8.2: Competitive Positioning Brief**
+
+Prepare answers to: "How is this different from X?"
+
+```markdown
+## COMPETITOR COMPARISON
+
+### Competitor A: [Name]
+What they do well: [honest assessment]
+Where we're better:
+- Dimension 1: [specific advantage]
+- Dimension 2: [specific advantage]
+One-liner: "While [X] does [Y], we [Z]"
+
+### Competitor B: [Name]
+[Repeat structure]
+
+### Our Unique Position
+The one thing only we do: [your moat]
+
+```
+
+### **Step 8.3: Anticipated Objections Prep**
+
+```markdown
+## OBJECTION HANDLING PLAYBOOK
+
+### Technical Skepticism
+Question: "How does [technical component] actually work?"
+Answer: [Prepared technical explanation]
+Evidence: [Code snippet, architecture diagram, or demo]
+
+### Feasibility Doubts
+Question: "Can this actually scale?"
+Answer: [Technical architecture that enables scale]
+Evidence: [Performance metrics or scalability design]
+
+### Market Questions
+Question: "Who would actually use this?"
+Answer: [User persona + market size data]
+Evidence: [Research findings, pain point validation]
+
+### Novelty Challenges
+Question: "Doesn't [competitor] already do this?"
+Answer: [Clear differentiation explanation]
+Evidence: [Side-by-side comparison or unique feature demo]
+
+### Build vs. Buy
+Question: "Why not just use [existing tool]?"
+Answer: [Gaps in existing solutions]
+Evidence: [User complaints, missing features]
+
+```
+
+---
+
+## 🔄 PHASE 9: CONTINUOUS ITERATION (Throughout)
+
+### **Step 9.1: Hourly Check-Ins**
+
+```markdown
+## PROGRESS TRACKING TEMPLATE
+
+### Status Update (every 2-3 hours)
+Time: [Hour X of hackathon]
+
+✅ Completed:
+- [Task 1]
+- [Task 2]
+
+🚧 In Progress:
+- [Task 3] - [% done] - ETA: [time]
+
+🚨 Blockers:
+- [Issue 1] - Impact: [High/Medium/Low]
+- Resolution plan: [action]
+
+📋 Next Sprint:
+- [Priority 1]
+- [Priority 2]
+
+🎯 On Track for Demo? [Yes/At Risk/No]
+If at risk: [Scope adjustment needed]
+
+```
+
+### **Step 9.2: Pivot Decision Framework**
+
+```markdown
+## WHEN TO PIVOT
+
+### Red Flags (consider pivoting if):
+- Core technology isn't working after 25% of time spent
+- User value is unclear or weak
+- Team morale is very low
+- Scope is obviously unachievable
+
+### Pivot Decision Matrix
+
+| Situation | Pivot Strategy |
+|-----------|----------------|
+| Tech not working | Simplify approach, use different tech |
+| Too ambitious | Cut features, focus on fewer flows |
+| Unclear value | Refocus on strongest use case |
+| Weak differentiation | Add unique twist or change angle |
+
+### Pivot Protocol
+1. Call team huddle
+2. Assess: What's working? What's not?
+3. Decide: Adjust or abandon?
+4. Commit: New plan documented and shared
+5. Execute: Full focus on new direction
+
+```
+
+---

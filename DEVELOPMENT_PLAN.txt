@@ -1,0 +1,1057 @@
+# REELMIND - 24-HOUR DEVELOPMENT PLAN
+
+**Generated**: January 11, 2026 @ 15:15 IST
+**Delivery Deadline**: January 12, 2026 @ 15:15 IST
+**Total Available Hours**: 24
+**Team Composition**: 3 Parallel Agents (Frontend, Backend, AI Service)
+**Architecture Pattern**: Microservices (Next.js Frontend, Node.js Backend, Python AI Service)
+
+---
+
+## SECTION 1: EXECUTIVE SUMMARY
+
+### 1.1 Project Scope
+
+ReelMind is an AI-powered entertainment companion that maintains persistent memory of users' viewing history, generates personalized episode recaps, provides intelligent recommendations that avoid duplicates, and engages users through interactive quizzes. Built on Google ADK with MongoDB for memory, it solves the problem of fragmented entertainment tracking through a conversational AI interface targeting students and binge-watchers.
+
+### 1.2 Critical Success Path
+
+**Primary Demo Flow**: User opens app → Chats with agent to add shows → Requests recap for a show → Gets personalized recommendation → Takes a quiz → Sees XP earned.
+
+This flow demonstrates ALL 5 must-have features in a single, cohesive journey.
+
+### 1.3 Development Philosophy
+
+**Vertical Slice First**: Build complete, thin features end-to-end before adding depth. Each phase delivers a working demo capability, not isolated components.
+
+**API-First**: Define and stub all API contracts in Phase 1 so frontend/backend can work in parallel.
+
+**Demo-Driven**: Every task is evaluated by "does this improve the demo?" Low-demo-impact work is deprioritized.
+
+### 1.4 Phase-Gate Checkpoints
+
+| Checkpoint | Hour | Validation Criteria |
+|------------|------|---------------------|
+| **Foundation Complete** | Hour 4 | All services running, auth working, DB connected |
+| **Core Chat Working** | Hour 10 | User can chat with agent, add shows to history |
+| **Recap + Recommend Live** | Hour 16 | AI generates recaps and recommendations |
+| **Quiz + Polish Complete** | Hour 22 | Quiz mode works, UI polished, demo data ready |
+| **Demo Ready** | Hour 24 | Full rehearsal complete, backup recorded |
+
+### 1.5 Highest Risk Factors
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| **Google ADK Integration** | Critical | Early integration in Phase 1; fallback to direct OpenAI calls |
+| **AI Response Latency** | High | Implement loading states early; cache common responses |
+| **Frontend-Backend Sync** | High | API contracts defined upfront; typed interfaces shared |
+| **TMDB API Rate Limits** | Medium | Aggressive caching (24hr); mock data for development |
+| **Quiz Content Quality** | Medium | Use GPT-4 for generation; pre-validate sample questions |
+
+### 1.6 Scope Management Strategy
+
+**Protected (Cannot Cut)**:
+- Conversational agent interface
+- Watch history CRUD via chat
+- Basic recap generation
+- One recommendation type
+
+**Flexible (Can Simplify)**:
+- Quiz difficulty scaling → Fixed difficulty
+- Character encyclopedia → Basic cast info only
+- Statistics dashboard → Simple stats text
+
+**Optional (First to Cut)**:
+- Watch party coordination
+- Voice interface
+- Calendar integration
+- Mood-based recommendations
+
+---
+
+## SECTION 2: PHASE-BASED DEVELOPMENT PLAN
+
+---
+
+## PHASE 1: FOUNDATION & INFRASTRUCTURE
+
+**Timeframe**: Hour 0 to Hour 4
+**Duration**: 4 hours
+**Objective**: All services running, authenticated, and communicating
+**Success Checkpoint**: User can register, login, and see main chat interface
+
+---
+
+### Phase 1 Task Breakdown
+
+---
+
+**TASK P1-001: Initialize Next.js Frontend Project**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P0 (Blocking)
+**Duration**: 30 minutes
+**Dependencies**: None
+
+**Requirements**:
+- Create Next.js 14 app with App Router
+- Configure Tailwind CSS with custom theme from PRD
+- Install: shadcn/ui, Framer Motion, Zustand, TanStack Query, Lucide React
+- Set up folder structure as per PRD architecture
+
+**Acceptance Criteria**:
+- [ ] `npm run dev` starts without errors on port 3000
+- [ ] Dark theme applied globally (#1A1B2E background)
+- [ ] TypeScript strict mode enabled
+- [ ] ESLint + Prettier configured
+
+---
+
+**TASK P1-002: Initialize Node.js Backend Project**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 30 minutes
+**Dependencies**: None
+
+**Requirements**:
+- Create Express.js project with TypeScript
+- Configure: Mongoose, JWT auth, Zod validation, CORS
+- Set up folder structure: controllers, services, models, routes, middleware
+- Create .env template with all required variables
+
+**Acceptance Criteria**:
+- [ ] `npm run dev` starts without errors on port 8000
+- [ ] Health endpoint returns 200 at GET /api/health
+- [ ] TypeScript compilation clean
+
+---
+
+**TASK P1-003: Initialize Python AI Service**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P0 (Blocking)
+**Duration**: 30 minutes
+**Dependencies**: None
+
+**Requirements**:
+- Create FastAPI project structure per PRD
+- Install: google-adk, openai, httpx, pydantic
+- Set up agents folder with ADK configuration
+- Create requirements.txt and .env template
+
+**Acceptance Criteria**:
+- [ ] `uvicorn main:app` starts on port 5000
+- [ ] Health endpoint at GET /health returns 200
+- [ ] OpenAPI docs available at /docs
+
+---
+
+**TASK P1-004: MongoDB Database Setup**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 30 minutes
+**Dependencies**: P1-002
+
+**Requirements**:
+- Create MongoDB connection module
+- Define Mongoose schemas per PRD: User, WatchHistory, QuizScore, Achievement
+- Create indexes for userId, email, title fields
+- Test connection with sample document
+
+**Acceptance Criteria**:
+- [ ] Connection to MongoDB successful
+- [ ] All 4 collections created with indexes
+- [ ] Sample document insert/query works
+
+---
+
+**TASK P1-005: Authentication System (Backend)**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 1.5 hours
+**Dependencies**: P1-004
+
+**Requirements**:
+- POST /api/auth/register - Create user, hash password, return tokens
+- POST /api/auth/login - Verify credentials, return tokens
+- POST /api/auth/refresh - Refresh access token
+- Auth middleware for protected routes
+- Zod validation for all inputs
+
+**API Contracts**:
+```
+POST /api/auth/register
+Body: { email, password, name }
+Response: { user: { id, email, name }, accessToken, refreshToken }
+
+POST /api/auth/login
+Body: { email, password }
+Response: { user: { id, email, name }, accessToken, refreshToken }
+```
+
+**Acceptance Criteria**:
+- [ ] Registration creates user with hashed password
+- [ ] Login returns valid JWT tokens
+- [ ] Protected route returns 401 without token
+- [ ] Refresh token generates new access token
+
+---
+
+**TASK P1-006: Authentication UI (Frontend)**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 1.5 hours
+**Dependencies**: P1-001, P1-005 (partial - can mock)
+
+**Requirements**:
+- Login page at /login with form (email, password)
+- Register page at /register with form (name, email, password)
+- Form validation with React Hook Form + Zod
+- Store tokens in memory (accessToken) and httpOnly cookie (refreshToken)
+- Redirect to main app after auth
+
+**UI Specifications**:
+- Dark theme, centered card with glass effect
+- Inputs with violet focus ring
+- Primary button (Electric Violet #7C3AED)
+- Link to switch between login/register
+
+**Acceptance Criteria**:
+- [ ] Forms validate before submission
+- [ ] Successful auth redirects to home
+- [ ] Error messages display for invalid credentials
+- [ ] Zustand store tracks auth state
+
+---
+
+**TASK P1-007: Design System Foundation**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 1 hour
+**Dependencies**: P1-001
+
+**Requirements**:
+- Tailwind config extended with PRD colors, fonts, spacing
+- Global CSS with Plus Jakarta Sans (headlines), Inter (body)
+- Base components from shadcn/ui: Button, Input, Card, Dialog
+- Custom variants matching PRD design system
+
+**Design Tokens**:
+```css
+--primary-bg: #1A1B2E
+--accent-violet: #7C3AED
+--accent-gold: #F59E0B
+--text-primary: #F8FAFC
+--text-secondary: #94A3B8
+```
+
+**Acceptance Criteria**:
+- [ ] All PRD colors available in Tailwind
+- [ ] Fonts loaded and applied correctly
+- [ ] Button variants (primary, secondary, ghost) styled
+- [ ] Card component with glass effect ready
+
+---
+
+### Phase 1 Exit Criteria
+
+- [ ] All 3 services running and healthy
+- [ ] User can register and login
+- [ ] Protected routes require authentication
+- [ ] Design system tokens applied
+- [ ] MongoDB connected with schemas
+
+---
+
+## PHASE 2: CORE CHAT INTERFACE & HISTORY
+
+**Timeframe**: Hour 4 to Hour 10
+**Duration**: 6 hours
+**Objective**: Users can chat with the AI agent and manage watch history
+**Success Checkpoint**: User adds a show via chat, sees it in history
+
+---
+
+### Phase 2 Task Breakdown
+
+---
+
+**TASK P2-001: Chat Interface UI**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P1-006, P1-007
+
+**Requirements**:
+- Main chat page at / (home for authenticated users)
+- ChatWindow component with message list and input
+- MessageBubble component (user vs agent styling)
+- Quick action chips below input ("Add Show", "Get Recap", "Quiz Me")
+- Auto-scroll to latest message
+- Typing indicator for agent responses
+
+**UI Specifications**:
+- Full height chat with padding
+- User messages: right-aligned, violet background
+- Agent messages: left-aligned, dark glass card
+- Avatar for agent (brain/lightbulb icon)
+- Input: dark glass, violet focus, send button
+
+**Acceptance Criteria**:
+- [ ] Messages render with proper styling
+- [ ] Input sends message on enter/click
+- [ ] Quick action chips visible and styled
+- [ ] Smooth scroll behavior
+- [ ] Typing indicator animates (3 dots pulse)
+
+---
+
+**TASK P2-002: Watch History API (Backend)**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P1-005
+
+**Requirements**:
+- GET /api/history - List user's watch history (paginated)
+- POST /api/history - Add new entry
+- PUT /api/history/:id - Update existing entry
+- DELETE /api/history/:id - Remove entry
+- GET /api/history/search?q= - Search by title
+
+**API Contracts**:
+```
+POST /api/history
+Body: { title, type, platform, status, progress, rating?, notes? }
+Response: { success: true, item: {...} }
+
+GET /api/history
+Query: ?page=1&limit=20&status=watching
+Response: { items: [...], total, page, pages }
+```
+
+**Acceptance Criteria**:
+- [ ] CRUD operations work correctly
+- [ ] Pagination returns proper metadata
+- [ ] Search finds partial title matches
+- [ ] User can only access own history
+- [ ] Validation rejects invalid inputs
+
+---
+
+**TASK P2-003: Google ADK Agent Setup**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P1-003
+
+**Requirements**:
+- Configure ADK agent with system prompt from PRD personality
+- Create history_tools.py with functions:
+  - get_watch_history(user_id)
+  - add_to_history(user_id, show_data)
+  - search_history(user_id, query)
+  - get_current_progress(user_id, title)
+- Register tools with agent
+- Create chat endpoint POST /api/chat
+
+**System Prompt**:
+```
+You are ReelMind, a friendly entertainment companion with a great memory. 
+You remember everything the user watches and help them track their viewing.
+Be conversational, slightly witty, and always helpful.
+When users mention shows, extract title, season, episode, and status.
+```
+
+**Acceptance Criteria**:
+- [ ] Agent responds to general messages
+- [ ] Agent correctly interprets "I watched X" commands
+- [ ] Agent calls history tools appropriately
+- [ ] Response time under 3 seconds for simple queries
+
+---
+
+**TASK P2-004: Chat Integration (Frontend-Backend)**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P2-001, P2-003
+
+**Requirements**:
+- Create useChat hook for managing chat state
+- Connect to POST /api/ai/chat endpoint
+- Handle streaming responses (if supported) or polling
+- Persist conversation in Zustand store
+- Handle errors gracefully with retry option
+
+**Implementation**:
+```typescript
+// useChat hook interface
+{
+  messages: Message[]
+  sendMessage: (text: string) => Promise<void>
+  isLoading: boolean
+  error: Error | null
+}
+```
+
+**Acceptance Criteria**:
+- [ ] User message appears immediately
+- [ ] Agent response appears when ready
+- [ ] Loading state shown during response
+- [ ] Errors display with retry button
+- [ ] Conversation persists during session
+
+---
+
+**TASK P2-005: AI-Backend Proxy Setup**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 1 hour
+**Dependencies**: P1-005, P2-003
+
+**Requirements**:
+- POST /api/ai/chat - Proxy to AI service
+- Pass user context (userId, relevant history)
+- Handle timeout (30 second max)
+- Log requests for debugging
+
+**Acceptance Criteria**:
+- [ ] Frontend can call /api/ai/chat
+- [ ] User context passed to AI service
+- [ ] Proper error handling for AI failures
+
+---
+
+**TASK P2-006: Watch History Page**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 1.5 hours
+**Dependencies**: P2-002, P1-007
+
+**Requirements**:
+- History page at /history
+- List view with ShowCard components
+- Filter by status (watching, completed, dropped, want_to_watch)
+- Each card shows: poster (placeholder), title, progress, rating
+- Click card to edit/delete
+
+**UI Specifications**:
+- Grid layout (3 columns desktop, 2 tablet, 1 mobile)
+- Status tabs at top
+- ShowCard with dark glass background, subtle hover lift
+
+**Acceptance Criteria**:
+- [ ] History loads and displays correctly
+- [ ] Filter tabs work
+- [ ] Empty state shown when no items
+- [ ] Cards are clickable
+
+---
+
+### Phase 2 Exit Criteria
+
+- [ ] User can chat with agent naturally
+- [ ] "I watched [show]" adds to history via agent
+- [ ] History page shows all tracked items
+- [ ] Agent calls tools correctly
+- [ ] No major UI/UX issues
+
+---
+
+## PHASE 3: RECAPS & RECOMMENDATIONS
+
+**Timeframe**: Hour 10 to Hour 16
+**Duration**: 6 hours
+**Objective**: AI generates personalized recaps and recommendations
+**Success Checkpoint**: User requests recap, gets spoiler-safe summary; gets personalized recommendation
+
+---
+
+### Phase 3 Task Breakdown
+
+---
+
+**TASK P3-001: Recap Generation Tool**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P0 (Blocking)
+**Duration**: 2.5 hours
+**Dependencies**: P2-003
+
+**Requirements**:
+- Create recap_tools.py with:
+  - generate_recap(title, from_episode, to_episode, user_progress)
+- Integrate with OpenAI GPT-4 for generation
+- Prompt engineering for spoiler-free content
+- Include character highlights in recap
+
+**Prompt Template**:
+```
+Generate a concise recap for [SHOW] covering episodes [FROM] to [TO].
+The user stopped at [PROGRESS]. Do NOT spoil any events after this point.
+Include: major plot points, key character developments, cliffhanger reminder.
+Format: 2-3 paragraphs, highlight character names in **bold**.
+```
+
+**Acceptance Criteria**:
+- [ ] Recap generated for any show in history
+- [ ] No spoilers beyond user's progress
+- [ ] Response time under 5 seconds
+- [ ] Formatted markdown output
+
+---
+
+**TASK P3-002: TMDB API Integration**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P1 (Critical)
+**Duration**: 1.5 hours
+**Dependencies**: P1-003
+
+**Requirements**:
+- Create tmdb_service.py for TMDB API calls
+- GET /search/tv - Search shows by name
+- GET /tv/{id} - Get show details
+- GET /tv/{id}/season/{season} - Get episode list
+- Cache responses for 24 hours (Redis or in-memory)
+
+**Acceptance Criteria**:
+- [ ] Search returns matching shows
+- [ ] Show details include cast, genres, overview
+- [ ] Episode data available per season
+- [ ] Rate limiting respected (50 req/sec)
+
+---
+
+**TASK P3-003: Recommendation Tool**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P2-003, P3-002
+
+**Requirements**:
+- Create recommend_tools.py with:
+  - get_recommendations(user_id, mood?, genre?, count=3)
+- Algorithm:
+  1. Analyze user's highly-rated shows
+  2. Extract preferred genres/themes
+  3. Search TMDB for similar content
+  4. Filter out watched/rejected titles
+  5. Generate "why" explanation for each
+
+**Acceptance Criteria**:
+- [ ] 3 recommendations returned by default
+- [ ] No duplicates of watched shows
+- [ ] Each has "why you'll like this" explanation
+- [ ] Mood/genre filter works
+
+---
+
+**TASK P3-004: Recap UI Components**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 1.5 hours
+**Dependencies**: P3-001, P2-004
+
+**Requirements**:
+- RecapCard component for displaying recaps in chat
+- Expandable format (summary preview → full text)
+- Character names as styled chips
+- "Spoiler Shield" badge showing coverage range
+- Loading skeleton for recap generation
+
+**Acceptance Criteria**:
+- [ ] Recap displays beautifully in chat
+- [ ] Expand/collapse works
+- [ ] Character names highlighted
+- [ ] Spoiler range visible (e.g., "Covering S1E1-S2E3")
+
+---
+
+**TASK P3-005: Recommendation UI Components**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 1.5 hours
+**Dependencies**: P3-003, P2-004
+
+**Requirements**:
+- RecommendationCard component for chat
+- Show: backdrop image (TMDB), title, rating, platform badge
+- "Why this?" expandable section
+- Action buttons: "Add to List" (👍) and "Not Interested" (👎)
+- Carousel for multiple recommendations
+
+**Acceptance Criteria**:
+- [ ] Cards display with all info
+- [ ] Actions trigger appropriate API calls
+- [ ] "Not Interested" prevents future recommendations
+- [ ] Carousel navigation works
+
+---
+
+**TASK P3-006: Rejected Titles API**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P2 (Important)
+**Duration**: 45 minutes
+**Dependencies**: P1-005
+
+**Requirements**:
+- POST /api/recommendations/reject - Add to rejected list
+- Rejected titles stored in user document or separate collection
+- AI service checks rejections before recommending
+
+**Acceptance Criteria**:
+- [ ] Rejection persists to database
+- [ ] Rejected shows never recommended again
+
+---
+
+### Phase 3 Exit Criteria
+
+- [ ] User says "recap [show]" → gets personalized recap
+- [ ] User says "recommend something" → gets 3 suggestions
+- [ ] Recommendations explain why they match user taste
+- [ ] No spoilers in recaps
+- [ ] Rejection works and persists
+
+---
+
+## PHASE 4: QUIZ MODE & GAMIFICATION
+
+**Timeframe**: Hour 16 to Hour 20
+**Duration**: 4 hours
+**Objective**: Interactive quiz with XP/levels working
+**Success Checkpoint**: User completes quiz, sees score and XP earned
+
+---
+
+### Phase 4 Task Breakdown
+
+---
+
+**TASK P4-001: Quiz Generation Tool**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P2-003, P3-002
+
+**Requirements**:
+- Create quiz_tools.py with:
+  - generate_quiz(title, max_episode, difficulty, count=5)
+  - validate_answer(question_id, user_answer)
+- Use GPT-4 to generate questions from show knowledge
+- Question types: multiple choice (4 options)
+- Store generated questions with correct answers
+
+**Prompt Template**:
+```
+Generate [COUNT] trivia questions about [SHOW] covering content through [MAX_EPISODE].
+Difficulty: [DIFFICULTY]. Do NOT include spoilers beyond this episode.
+Format: { question, options: [A, B, C, D], correct: "A|B|C|D", funFact }
+Types: character names, plot events, memorable quotes, behind-scenes trivia
+```
+
+**Acceptance Criteria**:
+- [ ] 5 unique questions generated
+- [ ] No spoilers beyond user progress
+- [ ] Each question has 4 options
+- [ ] Answer validation works
+
+---
+
+**TASK P4-002: Quiz API Endpoints**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 1.5 hours
+**Dependencies**: P1-005, P4-001
+
+**Requirements**:
+- POST /api/quiz/generate - Generate quiz for show
+- POST /api/quiz/submit - Submit answers, calculate score
+- GET /api/quiz/stats - Get user's quiz statistics
+- Update user XP and level on quiz completion
+
+**XP System**:
+- Correct answer: 10 XP
+- Perfect score bonus: 25 XP
+- Level = floor(totalXP / 100)
+
+**Acceptance Criteria**:
+- [ ] Quiz generation returns questions
+- [ ] Submission returns score and XP earned
+- [ ] User stats updated in database
+- [ ] Stats endpoint returns history
+
+---
+
+**TASK P4-003: Quiz UI Components**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P0 (Blocking)
+**Duration**: 2 hours
+**Dependencies**: P4-002, P1-007
+
+**Requirements**:
+- QuizQuestion component (question + 4 option buttons)
+- Timer display (optional, 30 sec default)
+- Progress bar (question X of Y)
+- Immediate feedback on answer (green/red animation)
+- QuizResults component (score, XP earned, fun facts)
+
+**Animations**:
+- Correct: checkmark pulse + green glow
+- Incorrect: shake + show correct answer
+- Completion: confetti animation
+
+**Acceptance Criteria**:
+- [ ] Questions display one at a time
+- [ ] Clicking option submits answer
+- [ ] Feedback animation plays
+- [ ] Results show at end with XP
+
+---
+
+**TASK P4-004: Chat-Quiz Integration**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 1 hour
+**Dependencies**: P4-003, P2-004
+
+**Requirements**:
+- Agent understands "quiz me on [show]"
+- Agent confirms show and starts quiz flow
+- Quiz renders within chat (or opens modal)
+- Results announced by agent after completion
+
+**Acceptance Criteria**:
+- [ ] Natural quiz initiation via chat
+- [ ] Quiz UI appears in context
+- [ ] Agent congratulates on completion
+- [ ] XP reflected in user profile
+
+---
+
+### Phase 4 Exit Criteria
+
+- [ ] Quiz generates dynamically for any show
+- [ ] Questions are spoiler-safe
+- [ ] XP/level system functional
+- [ ] Fun animations enhance experience
+- [ ] Agent orchestrates quiz flow
+
+---
+
+## PHASE 5: POLISH & DEMO PREPARATION
+
+**Timeframe**: Hour 20 to Hour 24
+**Duration**: 4 hours
+**Objective**: Production-quality demo with rehearsed flow
+**Success Checkpoint**: 3 complete demo rehearsals without issues
+
+---
+
+### Phase 5 Task Breakdown
+
+---
+
+**TASK P5-001: Demo Data Population**
+
+**Assigned To**: Backend Engineer
+**Service**: Backend
+**Priority**: P0 (Blocking)
+**Duration**: 1 hour
+**Dependencies**: All Phase 1-4 complete
+
+**Requirements**:
+- Create seed script with demo user account
+- Pre-populate 8-10 shows in various statuses
+- Include ratings and notes for realism
+- Shows should span genres (drama, comedy, thriller)
+
+**Demo Data Examples**:
+- Breaking Bad (Completed, 5 stars)
+- Succession (Watching S2E3)
+- Ted Lasso (Completed, 4 stars)
+- Severance (Want to Watch)
+- The Bear (Watching S1E5)
+
+**Acceptance Criteria**:
+- [ ] Demo account ready with email: demo@reelmind.ai
+- [ ] History populated with diverse content
+- [ ] Data looks realistic and varied
+
+---
+
+**TASK P5-002: UI Polish Pass**
+
+**Assigned To**: Frontend Specialist
+**Service**: Frontend
+**Priority**: P1 (Critical)
+**Duration**: 2 hours
+**Dependencies**: All UI tasks complete
+
+**Requirements**:
+- Review all screens for visual consistency
+- Add missing loading states and skeletons
+- Fix any spacing/alignment issues
+- Ensure animations are smooth (60fps)
+- Add empty states with illustrations
+- Mobile responsiveness check
+
+**Polish Checklist**:
+- [ ] All buttons have hover/active states
+- [ ] Forms show validation feedback
+- [ ] Loading indicators everywhere needed
+- [ ] Error states are friendly
+- [ ] Transitions feel smooth
+
+---
+
+**TASK P5-003: Agent Personality Tuning**
+
+**Assigned To**: AI/ML Engineer
+**Service**: AI Service
+**Priority**: P1 (Critical)
+**Duration**: 1 hour
+**Dependencies**: All AI tasks complete
+
+**Requirements**:
+- Refine system prompt for demo scenarios
+- Add personality quirks (witty one-liners, emoji usage)
+- Ensure graceful handling of edge cases
+- Test common demo flows for best responses
+
+**Personality Tweaks**:
+- Use occasional emoji (🎬, 🍿, 🎯)
+- Celebrate user achievements
+- Reference specific shows in context
+- Be concise but not robotic
+
+---
+
+**TASK P5-004: Demo Script & Rehearsal**
+
+**Assigned To**: All Team
+**Service**: N/A
+**Priority**: P0 (Blocking)
+**Duration**: 1.5 hours
+**Dependencies**: All other Phase 5 tasks
+
+**Demo Script (5 min)**:
+```
+1. Open ReelMind → Show landing tagline (10 sec)
+2. Chat: "I just finished The Bear Season 2" → Agent responds + adds (30 sec)
+3. Chat: "What happened in Succession?" → Personalized recap (45 sec)
+4. Chat: "I want something dark and thrilling" → 3 recommendations (45 sec)
+5. Chat: "Quiz me on Breaking Bad" → Take quiz, see XP (60 sec)
+6. Navigate to History → Show tracked items (30 sec)
+7. Highlight unique features → Close (60 sec)
+```
+
+**Rehearsal Goals**:
+- [ ] Run demo 3 times end-to-end
+- [ ] Time each segment
+- [ ] Identify any failure points
+- [ ] Record backup video
+
+---
+
+**TASK P5-005: Backup Video Recording**
+
+**Assigned To**: Frontend Specialist
+**Service**: N/A
+**Priority**: P1 (Critical)
+**Duration**: 30 minutes
+**Dependencies**: P5-004
+
+**Requirements**:
+- Record full demo flow at 1080p
+- Narrate while recording
+- Export as MP4
+- Test playback
+
+---
+
+### Phase 5 Exit Criteria
+
+- [ ] Demo account fully populated
+- [ ] All UI polished to PRD standards
+- [ ] Agent responses are engaging
+- [ ] 3 successful rehearsals complete
+- [ ] Backup video recorded
+
+---
+
+## SECTION 3: PARALLEL WORKSTREAM COORDINATION
+
+### 3.1 Team Structure
+
+**Frontend Specialist**:
+- Owns: All UI/UX components, client-side state, animations
+- Tasks: P1-001, P1-006, P1-007, P2-001, P2-004, P2-006, P3-004, P3-005, P4-003, P4-004, P5-002, P5-005
+
+**Backend Engineer**:
+- Owns: Express API, MongoDB, authentication, proxy to AI
+- Tasks: P1-002, P1-004, P1-005, P2-002, P2-005, P3-006, P4-002, P5-001
+
+**AI/ML Engineer**:
+- Owns: ADK agent, all AI tools, LLM integration, TMDB integration
+- Tasks: P1-003, P2-003, P3-001, P3-002, P3-003, P4-001, P5-003
+
+### 3.2 Synchronization Points
+
+| Hour | Sync Event | Participants | Agenda |
+|------|------------|--------------|--------|
+| 4 | Phase 1 Complete | All | Verify services, test auth flow |
+| 10 | Phase 2 Complete | All | Demo basic chat, add show |
+| 16 | Phase 3 Complete | All | Demo recaps + recommendations |
+| 20 | Phase 4 Complete | All | Demo quiz flow |
+| 22 | Pre-Demo Review | All | Polish items, blocker resolution |
+| 24 | Final Demo | All | Rehearsal + backup recording |
+
+### 3.3 Critical Path
+
+**Critical Path Tasks (Sequential)**:
+P1-002 → P1-004 → P1-005 → P2-002 → P2-003 → P2-004 → P3-001 → P4-001 → P5-001
+
+**Critical Path Duration**: ~14 hours (core functionality)
+**Parallel Buffer**: 10 hours for UI, polish, integration
+
+---
+
+## SECTION 4: RISK MANAGEMENT
+
+### 4.1 Risk Register
+
+| ID | Risk | Probability | Impact | Mitigation |
+|----|------|-------------|--------|------------|
+| R1 | ADK integration fails | Medium | Critical | Fallback to direct LangChain + OpenAI |
+| R2 | TMDB rate limited | Low | High | 24hr cache, mock data for dev |
+| R3 | Quiz quality poor | Medium | Medium | Pre-test 10 sample questions, iterate prompt |
+| R4 | Auth flow issues | Low | Critical | Test thoroughly in Phase 1 |
+| R5 | Frontend-Backend type mismatch | Medium | High | Shared TypeScript types, strict validation |
+
+### 4.2 Scope Flexibility
+
+**If behind by 2+ hours at Hour 16**:
+- Cut: Character encyclopedia (Feature 6)
+- Simplify: Statistics to text only (no charts)
+- Simplify: Quiz to 3 questions instead of 5
+
+**If behind by 4+ hours at Hour 20**:
+- Cut: Quiz mode entirely (focus on chat + recaps)
+- Cut: Recommendation explanations (just show titles)
+- Emergency: Use pre-recorded video for demo
+
+---
+
+## SECTION 5: DEPLOYMENT CHECKLIST
+
+### Pre-Demo Verification
+
+**Code Complete**:
+- [ ] All Phase 1-5 tasks marked complete
+- [ ] No console errors in production build
+- [ ] TypeScript compiles without errors
+
+**Environment Ready**:
+- [ ] Frontend deployed (Vercel or local)
+- [ ] Backend running (Railway or local)
+- [ ] AI Service running (local)
+- [ ] MongoDB accessible with demo data
+- [ ] TMDB API key configured
+- [ ] OpenAI API key configured
+
+**Demo Ready**:
+- [ ] Demo user account created
+- [ ] Demo data populated
+- [ ] All features manually tested
+- [ ] Backup video recorded
+- [ ] Team knows demo script
+
+---
+
+## APPENDIX: QUICK REFERENCE
+
+### API Endpoints Summary
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | /api/auth/register | Create account |
+| POST | /api/auth/login | Login |
+| GET | /api/history | Get watch history |
+| POST | /api/history | Add show |
+| POST | /api/ai/chat | Chat with agent |
+| POST | /api/quiz/generate | Generate quiz |
+| POST | /api/quiz/submit | Submit quiz |
+
+### Environment Variables
+
+```
+# Backend
+MONGODB_URI=mongodb://...
+JWT_SECRET=your-secret-key
+AI_SERVICE_URL=http://localhost:5000
+
+# AI Service
+OPENAI_API_KEY=sk-...
+TMDB_API_KEY=your-tmdb-key
+GOOGLE_ADK_PROJECT_ID=your-project
+
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+### Key File Locations
+
+```
+Frontend:  /src/app/page.tsx (main chat)
+Backend:   /src/routes/authRoutes.ts
+AI:        /src/agents/companion_agent.py
+```
+
+---
+
+**END OF DEVELOPMENT PLAN**
