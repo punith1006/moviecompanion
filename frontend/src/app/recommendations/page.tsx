@@ -36,6 +36,23 @@ export default function RecommendationsPage() {
     const [loadCount, setLoadCount] = useState(0); // Track auto-loads
     const [currentQuery, setCurrentQuery] = useState(''); // Track current search query for pagination
 
+    // Ref for deepMode to access latest value in fetchContent without adding it to dependencies
+    const deepModeRef = useRef(deepMode);
+
+    // Initialize deepMode from localStorage to persist across navigation
+    useEffect(() => {
+        const savedMode = localStorage.getItem('deepMode');
+        if (savedMode) {
+            setDeepMode(savedMode === 'true');
+        }
+    }, []);
+
+    // Persist deepMode changes
+    useEffect(() => {
+        localStorage.setItem('deepMode', String(deepMode));
+        deepModeRef.current = deepMode;
+    }, [deepMode]);
+
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     // Fetch content from TMDB API
@@ -49,8 +66,9 @@ export default function RecommendationsPage() {
 
         try {
             let response;
+            const useDeepMode = deepModeRef.current;
 
-            if (deepMode && query?.trim() && !append) {
+            if (useDeepMode && query?.trim() && !append) {
                 response = await api.aiSearch(query.trim());
             } else {
                 response = await api.discoverContent({
@@ -89,7 +107,7 @@ export default function RecommendationsPage() {
             setIsLoading(false);
             setIsLoadingMore(false);
         }
-    }, [contentType, sortBy, genre, deepMode]);
+    }, [contentType, sortBy, genre, currentQuery]); // Added currentQuery to dependencies
 
     // Load more content (auto)
     const loadMore = useCallback(() => {
@@ -102,6 +120,24 @@ export default function RecommendationsPage() {
         if (isLoadingMore || currentPage >= totalPages) return;
         fetchContent(currentQuery, currentPage + 1, true);
     }, [fetchContent, currentQuery, currentPage, totalPages, isLoadingMore]);
+
+    // Handle reset discovery event from Sidebar
+    useEffect(() => {
+        const handleReset = () => {
+            // Reset filters to defaults
+            setContentType('Movies');
+            setSortBy('Popular');
+            setGenre('All');
+            setSearchQuery('');
+            setCurrentQuery(''); // Clear committed query to prevent stale fetches
+            // DO NOT reset deepMode as requested
+
+            // Trigger fetch via state change (defaults)
+        };
+
+        window.addEventListener('reset-discovery', handleReset);
+        return () => window.removeEventListener('reset-discovery', handleReset);
+    }, [fetchContent]); // Dependencies should include fetchContent
 
     // Fetch on initial load and when filters change
     useEffect(() => {
@@ -129,15 +165,13 @@ export default function RecommendationsPage() {
     const handleSearch = () => {
         if (contentType !== 'All') {
             setContentType('All');
-            fetchContent(searchQuery, 1, false, 'All');
-        } else {
-            fetchContent(searchQuery);
         }
+        setCurrentQuery(searchQuery);
     };
 
     const clearSearch = () => {
         setSearchQuery('');
-        fetchContent();
+        // fetchContent removed to prevent auto-reload on clear
     };
 
     const handleImgError = (id: number) => {
