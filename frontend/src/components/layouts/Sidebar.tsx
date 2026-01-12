@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
+    Home,
     MessageSquare,
     Film,
     Sparkles,
@@ -19,9 +20,9 @@ import { useAuthStore } from '@/lib/stores/authStore';
 import { useSidebar } from './MainLayout';
 
 const navItems = [
-    { href: '/', label: 'Chat', icon: MessageSquare },
-    { href: '/history', label: 'History', icon: Film },
+    { href: '/', label: 'Home', icon: Home },
     { href: '/recommendations', label: 'Discover', icon: Sparkles },
+    { href: '/chat', label: 'Chat', icon: MessageSquare },
     { href: '/quiz', label: 'Quiz', icon: HelpCircle },
     { href: '/stats', label: 'Stats', icon: BarChart3 },
 ];

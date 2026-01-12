@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, ChevronDown, Plus, X, Star, Clock, Calendar, Brain, Loader2 } from 'lucide-react';
+import { Search, Sparkles, ChevronDown, Plus, X, Star, Clock, Calendar, Brain, Loader2, Layers, Check, Bookmark, Play } from 'lucide-react';
 import { MainLayout } from '@/components/layouts';
 import { api, ContentItem } from '@/lib/api';
 
@@ -35,6 +35,76 @@ export default function RecommendationsPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [loadCount, setLoadCount] = useState(0); // Track auto-loads
     const [currentQuery, setCurrentQuery] = useState(''); // Track current search query for pagination
+
+    const [addingId, setAddingId] = useState<number | null>(null);
+    const [itemStatuses, setItemStatuses] = useState<Map<number, string>>(new Map());
+
+    useEffect(() => {
+        const loadStatuses = async () => {
+            const result = await api.getWatchHistory();
+            if (result.success && result.data) {
+                const map = new Map<number, string>();
+                result.data.items.forEach(item => map.set(item.tmdbId, item.status));
+                setItemStatuses(map);
+            }
+        };
+        loadStatuses();
+    }, []);
+
+    const handleAddToLibrary = async (item: ExtendedContentItem) => {
+        if (addingId) return;
+
+        setAddingId(item.id);
+        try {
+            const result = await api.addOrUpdateWatch({
+                tmdbId: item.id,
+                title: item.title,
+                type: item.type,
+                posterUrl: item.posterUrl || undefined,
+                status: 'want_to_watch', // Library
+                platform: 'Other',
+                genres: [],
+            });
+
+            if (result.success) {
+                setItemStatuses(prev => new Map(prev).set(item.id, 'want_to_watch'));
+            } else {
+                console.error('Failed to add to library:', result.error);
+                // Optional: visual feedback for failure could be added here
+            }
+        } catch (error) {
+            console.error('Failed to add to library:', error);
+        } finally {
+            setAddingId(null);
+        }
+    };
+
+    const handleAddToWatchList = async (item: ExtendedContentItem) => {
+        if (addingId) return;
+
+        setAddingId(item.id);
+        try {
+            const result = await api.addOrUpdateWatch({
+                tmdbId: item.id,
+                title: item.title,
+                type: item.type,
+                posterUrl: item.posterUrl || undefined,
+                status: 'watching', // Continue Watching
+                platform: 'Other',
+                genres: [],
+            });
+
+            if (result.success) {
+                setItemStatuses(prev => new Map(prev).set(item.id, 'watching'));
+            } else {
+                console.error('Failed to add to watch list:', result.error);
+            }
+        } catch (error) {
+            console.error('Failed to add to watch list:', error);
+        } finally {
+            setAddingId(null);
+        }
+    };
 
     // Ref for deepMode to access latest value in fetchContent without adding it to dependencies
     const deepModeRef = useRef(deepMode);
@@ -577,10 +647,51 @@ export default function RecommendationsPage() {
                                         </div>
                                     )}
 
-                                    <button className="w-full py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-                                        <Plus className="w-4 h-4" />
-                                        Add to Watch List
-                                    </button>
+                                    <div className="flex flex-col gap-3">
+                                        <button
+                                            onClick={() => handleAddToLibrary(selectedItem)}
+                                            disabled={!!addingId || itemStatuses.get(selectedItem.id) === 'want_to_watch'}
+                                            className={`w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all ${itemStatuses.get(selectedItem.id) === 'want_to_watch'
+                                                ? 'bg-green-500/20 text-green-400 cursor-default'
+                                                : 'bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-900/20'
+                                                }`}
+                                        >
+                                            {addingId === selectedItem.id && !itemStatuses.has(selectedItem.id) ? (
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                            ) : itemStatuses.get(selectedItem.id) === 'want_to_watch' ? (
+                                                <>
+                                                    <Check className="w-5 h-5" />
+                                                    In Library
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Layers className="w-5 h-5" />
+                                                    Add to Library
+                                                </>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleAddToWatchList(selectedItem)}
+                                            disabled={!!addingId || itemStatuses.get(selectedItem.id) === 'watching'}
+                                            className={`w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all ${itemStatuses.get(selectedItem.id) === 'watching'
+                                                ? 'bg-green-500/20 text-green-400 cursor-default'
+                                                : 'bg-[#1c2128] hover:bg-[#30363d] text-white border border-[#30363d]'
+                                                }`}
+                                        >
+                                            {itemStatuses.get(selectedItem.id) === 'watching' ? (
+                                                <>
+                                                    <Check className="w-5 h-5" />
+                                                    In Watch List
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Play className="w-4 h-4 fill-current" />
+                                                    Add to Watch List
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </motion.div>
                         )}
