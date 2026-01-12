@@ -254,6 +254,11 @@ export default function RecommendationsPage() {
         if (contentType !== 'All') {
             setContentType('All');
         }
+        // Clear content immediately on deep mode search to show loading state
+        if (deepMode) {
+            setContent([]);
+            setIsLoading(true);
+        }
         setCurrentQuery(searchQuery);
     };
 

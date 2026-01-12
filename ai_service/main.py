@@ -40,7 +40,7 @@ class ChatRequest(BaseModel):
     userId: str
     conversationId: str
     context: Optional[Dict[str, Any]] = None
-    conversationHistory: Optional[List[Dict[str, str]]] = None
+    conversationHistory: Optional[List[Dict[str, Any]]] = None
 
 
 class ChatResponse(BaseModel):

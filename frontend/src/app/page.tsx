@@ -147,247 +147,249 @@ export default function HomePage() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col h-full p-4 md:p-6 w-full overflow-y-auto scrollbar-hide">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-2">
-              Home
-            </h1>
-            <p className="text-gray-400">Track all your shows and movies</p>
+      <div className="flex flex-col h-full bg-[#131620]">
+
+        {/* Dashboard Content (Scrollable) */}
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 pb-20 scrollbar-hide">
+
+          {/* Section Header */}
+          <div className="flex items-center gap-2 mb-6 mt-2">
+            <Layers className="w-5 h-5 text-violet-500" />
+            <h2 className="text-xl font-bold text-white">Your Library & Recommendations</h2>
           </div>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 border-b border-white/5 pb-1">
-          {STATUS_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`relative px-6 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
-                ? 'text-white'
-                : 'text-gray-400 hover:text-white'
-                }`}
-            >
-              {tab.label}
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Controls Bar */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 justify-between">
-          {/* Left: Type Filter Dropdown */}
-          <div className="flex items-center gap-3">
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1c2128] border border-white/10 text-gray-300 text-sm hover:bg-white/5 transition-colors min-w-[140px] justify-between">
-                <span className="capitalize">{filterType === 'all' ? 'All Types' : filterType === 'movie' ? 'Movies' : 'TV Series'}</span>
-                <ChevronDown className="w-4 h-4 opacity-50" />
+          {/* Tab Navigation */}
+          {/* ... existing tabs ... */}
+          <div className="flex flex-wrap items-center gap-2 mb-8 border-b border-white/5 pb-1">
+            {STATUS_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative px-6 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
+                  ? 'text-white'
+                  : 'text-gray-400 hover:text-white'
+                  }`}
+              >
+                {tab.label}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500"
+                  />
+                )}
               </button>
-              {/* Dropdown Menu - Simple CSS hover for now, can be state-based for better a11y */}
-              <div className="absolute top-full left-0 mt-2 w-full bg-[#1c2128] border border-white/10 rounded-xl overflow-hidden hidden group-hover:block z-20 shadow-xl shadow-black/50">
-                {['all', 'movie', 'series'].map((type) => (
+            ))}
+          </div>
+
+          {/* Controls Bar */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8 justify-between">
+            {/* Left: Type Filter Dropdown */}
+            <div className="flex items-center gap-3">
+              <div className="relative group">
+                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1c2128] border border-white/10 text-gray-300 text-sm hover:bg-white/5 transition-colors min-w-[140px] justify-between">
+                  <span className="capitalize">{filterType === 'all' ? 'All Types' : filterType === 'movie' ? 'Movies' : 'TV Series'}</span>
+                  <ChevronDown className="w-4 h-4 opacity-50" />
+                </button>
+                {/* Dropdown Menu - Simple CSS hover for now, can be state-based for better a11y */}
+                <div className="absolute top-full left-0 mt-2 w-full bg-[#1c2128] border border-white/10 rounded-xl overflow-hidden hidden group-hover:block z-20 shadow-xl shadow-black/50">
+                  {['all', 'movie', 'series'].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setFilterType(type as any)}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-white/5 ${filterType === type ? 'text-violet-400' : 'text-gray-400'}`}
+                    >
+                      {type === 'all' ? 'All Types' : type === 'movie' ? 'Movies' : 'TV Series'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Search & Sort */}
+            <div className="flex flex-1 md:flex-none items-center gap-3">
+              {/* Search */}
+              <div className="relative flex-1 md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1c2128] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-colors"
+                />
+              </div>
+
+              {/* Sort Pills */}
+              <div className="flex bg-[#1c2128] rounded-xl p-1 border border-white/10">
+                {SORT_OPTIONS.map((opt) => (
                   <button
-                    key={type}
-                    onClick={() => setFilterType(type as any)}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-white/5 ${filterType === type ? 'text-violet-400' : 'text-gray-400'}`}
+                    key={opt.id}
+                    onClick={() => setSortBy(opt.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${sortBy === opt.id
+                      ? 'bg-violet-600 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white'
+                      }`}
                   >
-                    {type === 'all' ? 'All Types' : type === 'movie' ? 'Movies' : 'TV Series'}
+                    {opt.label}
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Right: Search & Sort */}
-          <div className="flex flex-1 md:flex-none items-center gap-3">
-            {/* Search */}
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1c2128] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-violet-500 transition-colors"
-              />
-            </div>
-
-            {/* Sort Pills */}
-            <div className="flex bg-[#1c2128] rounded-xl p-1 border border-white/10">
-              {SORT_OPTIONS.map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => setSortBy(opt.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${sortBy === opt.id
-                    ? 'bg-violet-600 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
-                    }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Content Grid */}
-        <div className="flex-1 min-h-[50vh]">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />
-            </div>
-          ) : filteredEntries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center mt-12">
-              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                <Layers className="w-8 h-8 text-gray-600" />
+          {/* Content Grid */}
+          <div className="flex-1 min-h-[50vh]">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Library is empty</h3>
-              <p className="text-gray-400 max-w-sm">
-                {activeTab === 'want_to_watch'
-                  ? "Go to Discover to add some shows!"
-                  : "No items match your filters."}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-10">
-              {/* Special Layout for "All" tab - Split View */}
-              {activeTab === 'all' && !searchQuery && filterType === 'all' && sortBy === 'recent' ? (
-                <>
-                  {/* Continue Watching Section */}
-                  {filteredEntries.some(e => e.status === 'watching') && (
-                    <Section title="Continue Watching">
-                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                        <AnimatePresence mode="popLayout">
-                          {filteredEntries.filter(e => e.status === 'watching').map((entry) => (
-                            <div key={entry._id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
-                              <PosterCard
-                                entry={entry}
-                                onDelete={handleDelete}
-                                onMoveToCompleted={handleMoveToCompleted}
-                              />
-                            </div>
-                          ))}
-                        </AnimatePresence>
-                      </div>
-                    </Section>
-                  )}
-
-                  {/* Featured Movies */}
-                  {trendingMovies.length > 0 && (
-                    <Section title="Movies - Featured">
-                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                        {trendingMovies.map(movie => {
-                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(movie.id));
-                          return (
-                            <div key={movie.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
-                              <PosterCard
-                                entry={convertToEntry(movie, 'movie')}
-                                onDelete={() => { }} // No delete for discover items
-                                onAdd={() => handleQuickAdd(movie, 'movie')}
-                                isAdded={isAdded}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </Section>
-                  )}
-
-                  {/* Featured Series */}
-                  {trendingSeries.length > 0 && (
-                    <Section title="Series - Featured">
-                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                        {trendingSeries.map(series => {
-                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(series.id));
-                          return (
-                            <div key={series.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
-                              <PosterCard
-                                entry={convertToEntry(series, 'series')}
-                                onDelete={() => { }}
-                                onAdd={() => handleQuickAdd(series, 'series')}
-                                isAdded={isAdded}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </Section>
-                  )}
-
-                  {/* Popular Movies */}
-                  {popularMovies.length > 0 && (
-                    <Section title="Movies - Popular" link="/recommendations?type=Movies&sortBy=Popular">
-                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                        {popularMovies.map(movie => {
-                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(movie.id));
-                          return (
-                            <div key={movie.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
-                              <PosterCard
-                                entry={convertToEntry(movie, 'movie')}
-                                onDelete={() => { }}
-                                onAdd={() => handleQuickAdd(movie, 'movie')}
-                                isAdded={isAdded}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </Section>
-                  )}
-
-                  {/* Popular Series */}
-                  {popularSeries.length > 0 && (
-                    <Section title="Series - Popular" link="/recommendations?type=Series&sortBy=Popular">
-                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                        {popularSeries.map(series => {
-                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(series.id));
-                          return (
-                            <div key={series.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
-                              <PosterCard
-                                entry={convertToEntry(series, 'series')}
-                                onDelete={() => { }}
-                                onAdd={() => handleQuickAdd(series, 'series')}
-                                isAdded={isAdded}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </Section>
-                  )}
-                </>
-              ) : (
-                /* Standard Grid for filtered results or specific tabs */
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
-                  <AnimatePresence mode="popLayout">
-                    {filteredEntries.map((entry) => (
-                      <PosterCard
-                        key={entry._id}
-                        entry={entry}
-                        onDelete={handleDelete}
-                        onMoveToWatching={entry.status === 'want_to_watch' ? handleMoveToWatching : undefined}
-                      />
-                    ))}
-                  </AnimatePresence>
+            ) : filteredEntries.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-center mt-12">
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                  <Layers className="w-8 h-8 text-gray-600" />
                 </div>
-              )}
-            </div>
-          )}
+                <h3 className="text-lg font-semibold text-white mb-2">Library is empty</h3>
+                <p className="text-gray-400 max-w-sm">
+                  {activeTab === 'want_to_watch'
+                    ? "Go to Discover to add some shows!"
+                    : "No items match your filters."}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-10">
+                {/* Special Layout for "All" tab - Split View */}
+                {activeTab === 'all' && !searchQuery && filterType === 'all' && sortBy === 'recent' ? (
+                  <>
+                    {/* Continue Watching Section */}
+                    {filteredEntries.some(e => e.status === 'watching') && (
+                      <Section title="Continue Watching">
+                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                          <AnimatePresence mode="popLayout">
+                            {filteredEntries.filter(e => e.status === 'watching').map((entry) => (
+                              <div key={entry._id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                                <PosterCard
+                                  entry={entry}
+                                  onDelete={handleDelete}
+                                  onMoveToCompleted={handleMoveToCompleted}
+                                />
+                              </div>
+                            ))}
+                          </AnimatePresence>
+                        </div>
+                      </Section>
+                    )}
+
+                    {/* Featured Movies */}
+                    {trendingMovies.length > 0 && (
+                      <Section title="Movies - Featured">
+                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                          {trendingMovies.map(movie => {
+                            const isAdded = entries.some(e => Number(e.tmdbId) === Number(movie.id));
+                            return (
+                              <div key={movie.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                                <PosterCard
+                                  entry={convertToEntry(movie, 'movie')}
+                                  onDelete={() => { }} // No delete for discover items
+                                  onAdd={() => handleQuickAdd(movie, 'movie')}
+                                  isAdded={isAdded}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </Section>
+                    )}
+
+                    {/* Featured Series */}
+                    {trendingSeries.length > 0 && (
+                      <Section title="Series - Featured">
+                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                          {trendingSeries.map(series => {
+                            const isAdded = entries.some(e => Number(e.tmdbId) === Number(series.id));
+                            return (
+                              <div key={series.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                                <PosterCard
+                                  entry={convertToEntry(series, 'series')}
+                                  onDelete={() => { }}
+                                  onAdd={() => handleQuickAdd(series, 'series')}
+                                  isAdded={isAdded}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </Section>
+                    )}
+
+                    {/* Popular Movies */}
+                    {popularMovies.length > 0 && (
+                      <Section title="Movies - Popular" link="/recommendations?type=Movies&sortBy=Popular">
+                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                          {popularMovies.map(movie => {
+                            const isAdded = entries.some(e => Number(e.tmdbId) === Number(movie.id));
+                            return (
+                              <div key={movie.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                                <PosterCard
+                                  entry={convertToEntry(movie, 'movie')}
+                                  onDelete={() => { }}
+                                  onAdd={() => handleQuickAdd(movie, 'movie')}
+                                  isAdded={isAdded}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </Section>
+                    )}
+
+                    {/* Popular Series */}
+                    {popularSeries.length > 0 && (
+                      <Section title="Series - Popular" link="/recommendations?type=Series&sortBy=Popular">
+                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                          {popularSeries.map(series => {
+                            const isAdded = entries.some(e => Number(e.tmdbId) === Number(series.id));
+                            return (
+                              <div key={series.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                                <PosterCard
+                                  entry={convertToEntry(series, 'series')}
+                                  onDelete={() => { }}
+                                  onAdd={() => handleQuickAdd(series, 'series')}
+                                  isAdded={isAdded}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </Section>
+                    )}
+                  </>
+                ) : (
+                  /* Standard Grid for filtered results or specific tabs */
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
+                    <AnimatePresence mode="popLayout">
+                      {filteredEntries.map((entry) => (
+                        <PosterCard
+                          key={entry._id}
+                          entry={entry}
+                          onDelete={handleDelete}
+                          onMoveToWatching={entry.status === 'want_to_watch' ? handleMoveToWatching : undefined}
+                        />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Add Modal */}
+          <AnimatePresence>
+            {showAddModal && (
+              <AddShowModal onClose={() => setShowAddModal(false)} onAdded={loadHistory} />
+            )}
+          </AnimatePresence>
+
         </div>
-
-        {/* Add Modal */}
-        <AnimatePresence>
-          {showAddModal && (
-            <AddShowModal onClose={() => setShowAddModal(false)} onAdded={loadHistory} />
-          )}
-        </AnimatePresence>
-
       </div>
     </MainLayout>
   );
@@ -427,8 +429,8 @@ function Section({ title, children, link }: { title: string; children: React.Rea
           {title}
         </h2>
         {link && (
-          <Link href={link} className="flex items-center text-xs font-medium text-gray-400 hover:text-white transition-colors">
-            See All <ChevronRight className="w-4 h-4" />
+          <Link href={link} className="flex items-center text-sm font-medium text-gray-300 hover:text-white transition-colors">
+            See All <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         )}
       </div>

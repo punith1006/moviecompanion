@@ -2,6 +2,7 @@
 
 import { useState, createContext, useContext, ReactNode } from 'react';
 import { Sidebar, BottomNav, Header } from '@/components/layouts';
+import { ChatOverlay } from '@/components/chat/ChatOverlay';
 
 interface SidebarContextType {
     isCollapsed: boolean;
@@ -45,6 +46,9 @@ export function MainLayout({ children }: MainLayoutProps) {
                     {/* Mobile Bottom Nav */}
                     <BottomNav />
                 </main>
+
+                {/* Global Chat Overlay */}
+                <ChatOverlay />
             </div>
         </SidebarContext.Provider>
     );

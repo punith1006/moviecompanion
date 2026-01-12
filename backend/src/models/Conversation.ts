@@ -8,7 +8,7 @@ export interface IConversation extends Document {
         content: string;
         timestamp: Date;
         metadata?: {
-            type?: 'text' | 'recap' | 'recommendation' | 'quiz';
+            type?: 'text' | 'recap' | 'recommendation' | 'quiz' | 'discovery';
             toolsUsed?: string[];
             showId?: number;
         };
@@ -45,7 +45,7 @@ const conversationSchema = new Schema<IConversation>(
                 metadata: {
                     type: {
                         type: String,
-                        enum: ['text', 'recap', 'recommendation', 'quiz'],
+                        enum: ['text', 'recap', 'recommendation', 'quiz', 'discovery'],
                         default: 'text',
                     },
                     toolsUsed: [{ type: String }],

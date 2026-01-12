@@ -99,6 +99,13 @@ class TMDBService:
         data = await self._request("GET", f"discover/{endpoint}", params)
         return data.get("results", [])[:10]
     
+    async def get_trending(
+        self, media_type: str = "all", time_window: str = "week"
+    ) -> List[Dict[str, Any]]:
+        """Get trending movies and TV shows."""
+        data = await self._request("GET", f"trending/{media_type}/{time_window}")
+        return data.get("results", [])[:20]
+    
     async def get_genres(self, media_type: str = "tv") -> Dict[int, str]:
         """Get genre ID to name mapping."""
         endpoint = "movie" if media_type == "movie" else "tv"
