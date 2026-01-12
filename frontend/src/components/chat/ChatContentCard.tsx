@@ -71,7 +71,18 @@ export function ChatContentCard({ item, onAddToLibrary, onAddToWatchlist }: Chat
             transition={{ duration: 0.2 }}
         >
             {/* Poster Image */}
-            <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1a1f35] shadow-lg">
+            <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1a1f35] shadow-lg group">
+                {/* Content Type Badge - Styled like Reference */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 px-3 py-1 bg-black/80 backdrop-blur-md rounded-md flex items-center gap-2 shadow-lg border border-white/10">
+                    {item.type === 'movie' ? (
+                        <span className="text-purple-400">🎬</span>
+                    ) : (
+                        <span className="text-blue-400">📺</span>
+                    )}
+                    <span className="text-[10px] font-bold text-white uppercase tracking-widest leading-none pt-[1px]">
+                        {item.type === 'movie' ? 'MOVIE' : 'SERIES'}
+                    </span>
+                </div>
                 {!imgError && item.posterUrl ? (
                     <img
                         src={item.posterUrl}
@@ -105,8 +116,8 @@ export function ChatContentCard({ item, onAddToLibrary, onAddToWatchlist }: Chat
                     onClick={handleAddToLibrary}
                     disabled={inLibrary || addingToLibrary}
                     className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${inLibrary
-                            ? 'bg-green-500/20 text-green-400'
-                            : 'bg-violet-600 hover:bg-violet-500 text-white'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-violet-600 hover:bg-violet-500 text-white'
                         }`}
                 >
                     {addingToLibrary ? (
@@ -123,8 +134,8 @@ export function ChatContentCard({ item, onAddToLibrary, onAddToWatchlist }: Chat
                     onClick={handleAddToWatchlist}
                     disabled={inWatchlist || addingToWatchlist}
                     className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${inWatchlist
-                            ? 'bg-amber-500/20 text-amber-400'
-                            : 'bg-[#1c2128] hover:bg-[#2a2f3d] text-white border border-white/10'
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'bg-[#1c2128] hover:bg-[#2a2f3d] text-white border border-white/10'
                         }`}
                 >
                     {addingToWatchlist ? (
