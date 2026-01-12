@@ -18,12 +18,30 @@ interface ExtendedContentItem extends ContentItem {
     cast?: string[];
 }
 
+import { useRouter, useSearchParams } from 'next/navigation';
+
 export default function RecommendationsPage() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [deepMode, setDeepMode] = useState(false);
-    const [contentType, setContentType] = useState('Movies');
-    const [sortBy, setSortBy] = useState('Popular');
-    const [genre, setGenre] = useState('All');
+
+    // Initialize state from URL params or defaults
+    const [contentType, setContentType] = useState(searchParams.get('type') || 'Movies');
+    const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'Popular');
+    const [genre, setGenre] = useState(searchParams.get('genre') || 'All');
+
+    // Sync state with URL params on navigation changes
+    useEffect(() => {
+        const type = searchParams.get('type');
+        const sort = searchParams.get('sortBy');
+        const g = searchParams.get('genre');
+
+        if (type) setContentType(type);
+        if (sort) setSortBy(sort);
+        if (g) setGenre(g);
+    }, [searchParams]);
     const [content, setContent] = useState<ExtendedContentItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);

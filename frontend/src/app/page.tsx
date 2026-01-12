@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Clock, CheckCircle, Layers, Play, Star, MoreVertical, Trash2, ArrowUpDown, ChevronDown } from 'lucide-react';
+import { Plus, Search, Filter, Clock, CheckCircle, Eye, Heart, Star, Trash2, MoreVertical, Layers, Play, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react';
 import { MainLayout } from '@/components/layouts';
-import { api, WatchEntry } from '@/lib/api';
+import { api, WatchEntry, ContentItem } from '@/lib/api';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const STATUS_TABS = [
   { id: 'all', label: 'All', icon: null },
@@ -26,13 +28,19 @@ export default function HomePage() {
   // State
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'movie' | 'series'>('all'); // New Type Filter
-  const [sortBy, setSortBy] = useState('recent'); // New Sort Order
+  const [filterType, setFilterType] = useState<'all' | 'movie' | 'series'>('all');
+  const [sortBy, setSortBy] = useState('recent');
+
+  const [trendingMovies, setTrendingMovies] = useState<ContentItem[]>([]);
+  const [trendingSeries, setTrendingSeries] = useState<ContentItem[]>([]);
+  const [popularMovies, setPopularMovies] = useState<ContentItem[]>([]);
+  const [popularSeries, setPopularSeries] = useState<ContentItem[]>([]);
 
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     loadHistory();
+    fetchDiscoveryData();
   }, [activeTab]);
 
   const loadHistory = async () => {
@@ -44,6 +52,23 @@ export default function HomePage() {
       setEntries(result.data.items);
     }
     setIsLoading(false);
+  };
+
+  const fetchDiscoveryData = async () => {
+    // Only fetch for 'all' tab to save resources, or fetch once on mount
+    if (activeTab === 'all') {
+      const [tm, ts, pm, ps] = await Promise.all([
+        api.getTrending('movie'),
+        api.getTrending('tv'),
+        api.discoverContent({ type: 'Movies', sortBy: 'Popular' }),
+        api.discoverContent({ type: 'Series', sortBy: 'Popular' })
+      ]);
+
+      if (tm.success && tm.data?.results) setTrendingMovies(tm.data.results.slice(0, 10));
+      if (ts.success && ts.data?.results) setTrendingSeries(ts.data.results.slice(0, 10));
+      if (pm.success && pm.data?.results) setPopularMovies(pm.data.results.slice(0, 10));
+      if (ps.success && ps.data?.results) setPopularSeries(ps.data.results.slice(0, 10));
+    }
   };
 
   // Filter & Sort Logic
@@ -87,9 +112,42 @@ export default function HomePage() {
     }
   };
 
+  const handleMoveToCompleted = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Optimistic update
+    const updatedEntries = entries.map(e => e._id === id ? { ...e, status: 'completed' } as WatchEntry : e);
+    setEntries(updatedEntries);
+
+    try {
+      await api.updateWatchEntry(id, { status: 'completed' });
+      loadHistory();
+    } catch (error) {
+      console.error('Failed to move to completed', error);
+      loadHistory();
+    }
+  };
+
+  const handleQuickAdd = async (item: ContentItem, type: 'movie' | 'series') => {
+    // Quick add to library (Want to Watch)
+    try {
+      await api.addOrUpdateWatch({
+        tmdbId: item.id,
+        title: item.title,
+        type: type,
+        platform: 'Other',
+        status: 'want_to_watch',
+        posterUrl: item.posterUrl || undefined,
+        genres: []
+      });
+      loadHistory(); // Refresh library
+    } catch (error) {
+      console.error("Failed to add", error);
+    }
+  };
+
   return (
     <MainLayout>
-      <div className="flex flex-col h-full p-4 md:p-6 w-full">
+      <div className="flex flex-col h-full p-4 md:p-6 w-full overflow-y-auto scrollbar-hide">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
@@ -203,46 +261,105 @@ export default function HomePage() {
                 <>
                   {/* Continue Watching Section */}
                   {filteredEntries.some(e => e.status === 'watching') && (
-                    <div>
-                      <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-                        <div className="w-2 h-6 bg-violet-500 rounded-full" />
-                        Continue Watching
-                      </h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
+                    <Section title="Continue Watching">
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
                         <AnimatePresence mode="popLayout">
                           {filteredEntries.filter(e => e.status === 'watching').map((entry) => (
-                            <PosterCard
-                              key={entry._id}
-                              entry={entry}
-                              onDelete={handleDelete}
-                            // No move-to-watch action needed here as they are already watching
-                            />
+                            <div key={entry._id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                              <PosterCard
+                                entry={entry}
+                                onDelete={handleDelete}
+                                onMoveToCompleted={handleMoveToCompleted}
+                              />
+                            </div>
                           ))}
                         </AnimatePresence>
                       </div>
-                    </div>
+                    </Section>
                   )}
 
-                  {/* Library/Other Section */}
-                  {filteredEntries.some(e => e.status !== 'watching') && (
-                    <div>
-                      <h2 className="text-lg font-bold text-gray-400 mb-5 flex items-center gap-2">
-                        <div className="w-2 h-6 bg-gray-600 rounded-full" />
-                        Library & Completed
-                      </h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
-                        <AnimatePresence mode="popLayout">
-                          {filteredEntries.filter(e => e.status !== 'watching').map((entry) => (
-                            <PosterCard
-                              key={entry._id}
-                              entry={entry}
-                              onDelete={handleDelete}
-                              onMoveToWatching={entry.status === 'want_to_watch' ? handleMoveToWatching : undefined}
-                            />
-                          ))}
-                        </AnimatePresence>
+                  {/* Featured Movies */}
+                  {trendingMovies.length > 0 && (
+                    <Section title="Movies - Featured">
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                        {trendingMovies.map(movie => {
+                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(movie.id));
+                          return (
+                            <div key={movie.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                              <PosterCard
+                                entry={convertToEntry(movie, 'movie')}
+                                onDelete={() => { }} // No delete for discover items
+                                onAdd={() => handleQuickAdd(movie, 'movie')}
+                                isAdded={isAdded}
+                              />
+                            </div>
+                          );
+                        })}
                       </div>
-                    </div>
+                    </Section>
+                  )}
+
+                  {/* Featured Series */}
+                  {trendingSeries.length > 0 && (
+                    <Section title="Series - Featured">
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                        {trendingSeries.map(series => {
+                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(series.id));
+                          return (
+                            <div key={series.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                              <PosterCard
+                                entry={convertToEntry(series, 'series')}
+                                onDelete={() => { }}
+                                onAdd={() => handleQuickAdd(series, 'series')}
+                                isAdded={isAdded}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </Section>
+                  )}
+
+                  {/* Popular Movies */}
+                  {popularMovies.length > 0 && (
+                    <Section title="Movies - Popular" link="/recommendations?type=Movies&sortBy=Popular">
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                        {popularMovies.map(movie => {
+                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(movie.id));
+                          return (
+                            <div key={movie.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                              <PosterCard
+                                entry={convertToEntry(movie, 'movie')}
+                                onDelete={() => { }}
+                                onAdd={() => handleQuickAdd(movie, 'movie')}
+                                isAdded={isAdded}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </Section>
+                  )}
+
+                  {/* Popular Series */}
+                  {popularSeries.length > 0 && (
+                    <Section title="Series - Popular" link="/recommendations?type=Series&sortBy=Popular">
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                        {popularSeries.map(series => {
+                          const isAdded = entries.some(e => Number(e.tmdbId) === Number(series.id));
+                          return (
+                            <div key={series.id} className="min-w-[160px] w-[160px] md:min-w-[200px] md:w-[200px] snap-start">
+                              <PosterCard
+                                entry={convertToEntry(series, 'series')}
+                                onDelete={() => { }}
+                                onAdd={() => handleQuickAdd(series, 'series')}
+                                isAdded={isAdded}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </Section>
                   )}
                 </>
               ) : (
@@ -284,11 +401,53 @@ function AddShowModal({ onClose, onAdded }: { onClose: () => void; onAdded: () =
   return null; // Temporarily disabling manual add as we focus on Discover add workflow (as per previous tasks)
 }
 
-function PosterCard({ entry, onDelete, onMoveToWatching }: {
+// Helper to convert ContentItem to WatchEntry shape for display
+const convertToEntry = (item: ContentItem, type: 'movie' | 'series'): WatchEntry => ({
+  _id: item.id.toString(),
+  userId: 'temp',
+  tmdbId: item.id,
+  title: item.title,
+  type: type,
+  platform: 'Other',
+  status: 'want_to_watch', // Dummy status, will be overridden by logic if needed
+  genres: [],
+  posterUrl: item.posterUrl || undefined,
+  firstWatchedAt: '',
+  lastWatchedAt: '',
+  savedQuotes: [],
+  // Add a flag to indicate this is a discovery item if needed, mainly strict typing
+} as WatchEntry);
+
+function Section({ title, children, link }: { title: string; children: React.ReactNode; link?: string }) {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          {title.includes('Continue') && <div className="w-2 h-6 bg-violet-500 rounded-full" />}
+          {title}
+        </h2>
+        {link && (
+          <Link href={link} className="flex items-center text-xs font-medium text-gray-400 hover:text-white transition-colors">
+            See All <ChevronRight className="w-4 h-4" />
+          </Link>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function PosterCard({ entry, onDelete, onMoveToWatching, onMoveToCompleted, onAdd, isAdded }: {
   entry: WatchEntry;
   onDelete: (id: string, e: React.MouseEvent) => void;
   onMoveToWatching?: (id: string, e: React.MouseEvent) => void;
+  onMoveToCompleted?: (id: string, e: React.MouseEvent) => void;
+  onAdd?: (id: string, e: React.MouseEvent) => void;
+  isAdded?: boolean;
 }) {
+  const isLibraryItem = entry.status && entry.savedQuotes; // Quick check if it's a full WatchEntry
+  const isDiscoverItem = !!onAdd; // If onAdd is passed, treat as discover item
+
   return (
     <motion.div
       layout
@@ -315,14 +474,16 @@ function PosterCard({ entry, onDelete, onMoveToWatching }: {
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
 
         {/* Top Actions (Delete) */}
-        <div className="absolute top-2 right-2 flex gap-2 translate-y-[-10px] group-hover:translate-y-0 transition-transform duration-300 delay-75">
-          <button
-            onClick={(e) => onDelete(entry._id, e)}
-            className="p-2 rounded-full bg-black/40 hover:bg-red-500/80 text-white transition-colors backdrop-blur-sm"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+        {!isDiscoverItem && (
+          <div className="absolute top-2 right-2 flex gap-2 translate-y-[-10px] group-hover:translate-y-0 transition-transform duration-300 delay-75">
+            <button
+              onClick={(e) => onDelete(entry._id, e)}
+              className="p-2 rounded-full bg-black/40 hover:bg-red-500/80 text-white transition-colors backdrop-blur-sm"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Content Info */}
         <div className="translate-y-[10px] group-hover:translate-y-0 transition-transform duration-300">
@@ -339,14 +500,37 @@ function PosterCard({ entry, onDelete, onMoveToWatching }: {
           </div>
 
           {/* Status Badge */}
-          <div className="mb-3">
-            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-sm ${entry.status === 'watching' ? 'bg-violet-500/80 text-white' :
-              entry.status === 'completed' ? 'bg-green-500/80 text-white' :
-                'bg-pink-500/80 text-white'
-              }`}>
-              {entry.status.replace(/_/g, ' ')}
-            </span>
-          </div>
+          {!isDiscoverItem && (
+            <div className="mb-3">
+              <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-sm ${entry.status === 'watching' ? 'bg-violet-500/80 text-white' :
+                entry.status === 'completed' ? 'bg-green-500/80 text-white' :
+                  'bg-pink-500/80 text-white'
+                }`}>
+                {entry.status.replace(/_/g, ' ')}
+              </span>
+            </div>
+          )}
+
+          {/* Action: Add to Library (Discover Item) */}
+          {isDiscoverItem && onAdd && (
+            isAdded ? (
+              <button
+                disabled
+                className="w-full py-2 rounded-lg bg-green-500/20 text-green-200 text-xs font-bold flex items-center justify-center gap-2 mt-1 cursor-default border border-green-500/30"
+              >
+                <CheckCircle className="w-3 h-3" />
+                In Library
+              </button>
+            ) : (
+              <button
+                onClick={(e) => onAdd(entry._id, e)}
+                className="w-full py-2 rounded-lg bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-bold flex items-center justify-center gap-2 transition-all mt-1"
+              >
+                <Plus className="w-3 h-3 fill-current" />
+                Add to Library
+              </button>
+            )
+          )}
 
           {/* Action: Move to Watching (Only if handler provided) */}
           {onMoveToWatching && (
@@ -356,6 +540,17 @@ function PosterCard({ entry, onDelete, onMoveToWatching }: {
             >
               <Play className="w-3 h-3 fill-current" />
               Start Watching
+            </button>
+          )}
+
+          {/* Action: Mark as Completed */}
+          {onMoveToCompleted && (
+            <button
+              onClick={(e) => onMoveToCompleted(entry._id, e)}
+              className="w-full py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 backdrop-blur-sm text-green-200 hover:text-white text-xs font-bold flex items-center justify-center gap-2 transition-all mt-1 border border-green-500/30"
+            >
+              <CheckCircle className="w-3 h-3" />
+              Mark Completed
             </button>
           )}
         </div>
