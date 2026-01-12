@@ -208,7 +208,7 @@ export default function HomePage() {
                         <div className="w-2 h-6 bg-violet-500 rounded-full" />
                         Continue Watching
                       </h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
                         <AnimatePresence mode="popLayout">
                           {filteredEntries.filter(e => e.status === 'watching').map((entry) => (
                             <PosterCard
@@ -230,7 +230,7 @@ export default function HomePage() {
                         <div className="w-2 h-6 bg-gray-600 rounded-full" />
                         Library & Completed
                       </h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
                         <AnimatePresence mode="popLayout">
                           {filteredEntries.filter(e => e.status !== 'watching').map((entry) => (
                             <PosterCard
@@ -247,7 +247,7 @@ export default function HomePage() {
                 </>
               ) : (
                 /* Standard Grid for filtered results or specific tabs */
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6">
                   <AnimatePresence mode="popLayout">
                     {filteredEntries.map((entry) => (
                       <PosterCard
