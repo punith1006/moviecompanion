@@ -146,6 +146,14 @@ class ApiClient {
         return this.request<{ conversation: Conversation }>(`/chat/conversations/${id}`);
     }
 
+    async getChatHistory() {
+        return this.request<{ conversation: Conversation }>('/chat/history');
+    }
+
+    async clearChatHistory() {
+        return this.request<{ message: string }>('/chat/history', { method: 'DELETE' });
+    }
+
     // Content/Discovery endpoints
     async discoverContent(params: {
         type?: 'Movies' | 'Series' | 'All';
@@ -273,6 +281,8 @@ export interface Message {
         type?: string;
         toolsUsed?: string[];
         showId?: number;
+        contentCards?: ContentItem[];
+        suggestedReplies?: { label: string; icon: string }[];
     };
 }
 

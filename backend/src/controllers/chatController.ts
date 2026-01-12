@@ -101,6 +101,8 @@ export async function sendMessage(req: AuthRequest, res: Response): Promise<void
                 type: aiResponse.type || 'text',
                 toolsUsed: aiResponse.toolsUsed || [],
                 showId: aiResponse.showId,
+                contentCards: aiResponse.metadata?.contentCards,
+                suggestedReplies: aiResponse.metadata?.suggestedReplies,
             },
         });
 
@@ -158,7 +160,58 @@ export async function getConversation(req: AuthRequest, res: Response): Promise<
     }
 }
 
-// Get all conversations
+// Get persistent conversation history
+export async function getHistory(req: AuthRequest, res: Response): Promise<void> {
+    try {
+        // Find the most recent active conversation
+        let conversation = await Conversation.findOne({
+            userId: req.user!._id,
+            isActive: true, // Only get the active one
+        }).sort({ lastInteractionAt: -1 });
+
+        // If no active conversation, create one
+        if (!conversation) {
+            conversation = await Conversation.create({
+                userId: req.user!._id,
+                messages: [{
+                    role: 'assistant',
+                    content: `Hey ${req.user!.name}! I'm ReelMind, your personal entertainment companion. 🎬 I remember everything you watch. Tell me something you've seen recently, or ask me for recommendations!`,
+                    timestamp: new Date(),
+                    metadata: { type: 'text' },
+                }],
+                isActive: true,
+                lastInteractionAt: new Date(),
+            });
+        }
+
+        res.json({
+            success: true,
+            data: { conversation },
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Clear conversation history
+export async function clearHistory(req: AuthRequest, res: Response): Promise<void> {
+    try {
+        // Mark all active conversations as inactive
+        await Conversation.updateMany(
+            { userId: req.user!._id, isActive: true },
+            { isActive: false }
+        );
+
+        res.json({
+            success: true,
+            message: 'Conversation cleared'
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Get all conversations (Legacy/Admin use)
 export async function getConversations(req: AuthRequest, res: Response): Promise<void> {
     try {
         const conversations = await Conversation.find({ userId: req.user!._id })

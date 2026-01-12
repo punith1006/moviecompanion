@@ -3,6 +3,8 @@ import {
     sendMessage,
     getConversation,
     getConversations,
+    getHistory,
+    clearHistory,
     newConversation,
     deleteConversation,
     chatSchema,
@@ -15,6 +17,8 @@ const router = Router();
 router.use(authenticateToken);
 
 // Conversation management
+router.get('/history', getHistory);
+router.delete('/history', clearHistory);
 router.get('/conversations', getConversations);
 router.post('/conversations', newConversation);
 router.get('/conversations/:id', getConversation);

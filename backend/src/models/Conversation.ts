@@ -11,6 +11,8 @@ export interface IConversation extends Document {
             type?: 'text' | 'recap' | 'recommendation' | 'quiz' | 'discovery';
             toolsUsed?: string[];
             showId?: number;
+            contentCards?: any[];
+            suggestedReplies?: Array<{ label: string; icon: string }>;
         };
     }>;
     isActive: boolean;
@@ -50,6 +52,12 @@ const conversationSchema = new Schema<IConversation>(
                     },
                     toolsUsed: [{ type: String }],
                     showId: { type: Number },
+                    // New fields for persistence
+                    contentCards: [{ type: Schema.Types.Mixed }], // Store card data
+                    suggestedReplies: [{
+                        label: String,
+                        icon: String
+                    }],
                 },
             },
         ],

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User } from 'lucide-react';
+import { Send, Sparkles, User, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useChat, Message } from '@/hooks/useChat';
@@ -8,9 +8,19 @@ import { QuickReplyChips } from './QuickReplyChips';
 
 
 export function ChatWindow() {
-    const { messages, sendMessage, isLoading, error } = useChat();
+    const { messages, sendMessage, clearChat, isLoading, error } = useChat();
     const [inputValue, setInputValue] = useState('');
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const handleClearClick = () => {
+        setShowClearConfirm(true);
+    };
+
+    const confirmClear = () => {
+        clearChat();
+        setShowClearConfirm(false);
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -110,10 +120,12 @@ export function ChatWindow() {
                             {/* Future: Voice button */}
                         </div>
                     </div>
+
+                    {/* Clear Button */}
                     <button
                         onClick={handleSend}
                         disabled={!inputValue.trim() || isLoading}
-                        className="p-4 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-lg shadow-violet-900/20 transition-all active:scale-95"
+                        className="h-[60px] w-[60px] flex items-center justify-center rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-lg shadow-violet-900/20 transition-all active:scale-95 flex-shrink-0"
                     >
                         <Send className={`w-5 h-5 ${isLoading ? 'opacity-0' : 'opacity-100'}`} />
                         {isLoading && (
@@ -122,11 +134,54 @@ export function ChatWindow() {
                             </div>
                         )}
                     </button>
+
+                    {/* Clear Button */}
+                    <button
+                        onClick={handleClearClick}
+                        disabled={isLoading || messages.length === 0}
+                        className="h-[60px] w-[60px] flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                        title="Clear Conversation"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                    </button>
                 </div>
                 <div className="text-center mt-2">
                     <span className="text-[10px] text-gray-600">ReelMind AI can make mistakes. Have fun! ✨</span>
                 </div>
             </div>
+
+            {/* Confirmation Modal */}
+            <AnimatePresence>
+                {showClearConfirm && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="bg-[#1a1f35] border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+                        >
+                            <h3 className="text-lg font-bold text-white mb-2">Clear Conversation?</h3>
+                            <p className="text-gray-400 text-sm mb-6">
+                                This will start a fresh chat. Your current history cannot be recovered.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setShowClearConfirm(false)}
+                                    className="px-4 py-2 rounded-lg text-gray-300 hover:bg-white/5 transition-colors text-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmClear}
+                                    className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition-colors"
+                                >
+                                    Clear Chat
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

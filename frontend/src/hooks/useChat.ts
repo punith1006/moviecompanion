@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { api, ContentItem } from '@/lib/api';
 
 export interface SuggestedReply {
@@ -25,6 +25,34 @@ export function useChat() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [conversationId, setConversationId] = useState<string | undefined>(undefined);
+
+    // Initial load: Get persistent history
+    useEffect(() => {
+        const loadHistory = async () => {
+            try {
+                const response = await api.getChatHistory();
+                if (response.success && response.data?.conversation) {
+                    const conv = response.data.conversation;
+                    setConversationId(conv._id);
+
+                    // Map backend messages to frontend format
+                    const historyMessages: Message[] = (conv.messages || []).map((msg: any) => ({
+                        id: msg._id || Date.now().toString() + Math.random(), // Use DB ID or fallback
+                        role: msg.role,
+                        content: msg.content,
+                        timestamp: msg.timestamp,
+                        metadata: msg.metadata
+                    }));
+
+                    setMessages(historyMessages);
+                }
+            } catch (err) {
+                console.error("Failed to load history:", err);
+            }
+        };
+
+        loadHistory();
+    }, []);
 
     const sendMessage = useCallback(async (content: string) => {
         if (!content.trim()) return;
@@ -82,9 +110,24 @@ export function useChat() {
         }
     }, [conversationId]);
 
+    const clearChat = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            await api.clearChatHistory();
+            setMessages([]);
+            setConversationId(undefined);
+        } catch (err) {
+            console.error('Failed to clear chat:', err);
+            setError('Failed to clear chat');
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
     return {
         messages,
         sendMessage,
+        clearChat,
         isLoading,
         error,
         conversationId
