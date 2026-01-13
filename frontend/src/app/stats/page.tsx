@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, TrendingUp, Clock, Star, Trophy, Zap, Tv, Film, Quote } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { MainLayout } from '@/components/layouts';
 import { api, WatchStats, SavedQuote } from '@/lib/api';
 import { useAuthStore } from '@/lib/stores/authStore';
@@ -144,28 +145,57 @@ export default function StatsPage() {
                         </h3>
 
                         {stats?.topGenres && stats.topGenres.length > 0 ? (
-                            <div className="space-y-3">
-                                {stats.topGenres.slice(0, 5).map((genre, i) => {
-                                    const maxCount = stats.topGenres[0].count;
-                                    const percentage = (genre.count / maxCount) * 100;
-
-                                    return (
-                                        <div key={genre.genre}>
-                                            <div className="flex justify-between text-sm mb-1">
-                                                <span className="text-white">{genre.genre}</span>
-                                                <span className="text-gray-400">{genre.count}</span>
-                                            </div>
-                                            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${percentage}%` }}
-                                                    transition={{ duration: 0.8, delay: i * 0.1 }}
-                                                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-600"
+                            <div className="h-[300px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats.topGenres.slice(0, 5)}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={100}
+                                            paddingAngle={5}
+                                            dataKey="count"
+                                            nameKey="genre"
+                                        >
+                                            {stats.topGenres.slice(0, 5).map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={[
+                                                        '#8b5cf6', // Violet 500
+                                                        '#a855f7', // Purple 500
+                                                        '#d946ef', // Fuchsia 500
+                                                        '#ec4899', // Pink 500
+                                                        '#f43f5e'  // Rose 500
+                                                    ][index % 5]}
+                                                    stroke="rgba(255,255,255,0.1)"
                                                 />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'rgba(17, 17, 27, 0.8)',
+                                                backdropFilter: 'blur(12px)',
+                                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                                borderRadius: '12px',
+                                                padding: '12px',
+                                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                            }}
+                                            itemStyle={{ color: '#fff', fontSize: '14px', fontWeight: 500 }}
+                                            formatter={(value: number, name: string) => {
+                                                const total = stats.topGenres.slice(0, 5).reduce((acc, curr) => acc + curr.count, 0);
+                                                const percent = ((value / total) * 100).toFixed(1);
+                                                return [`${value} shows (${percent}%)`, name];
+                                            }}
+                                        />
+                                        <Legend
+                                            active={true} // Recharts type hack if needed, but usually redundant
+                                            verticalAlign="bottom"
+                                            height={36}
+                                            wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </div>
                         ) : (
                             <p className="text-gray-500 text-center py-4">No genre data yet</p>

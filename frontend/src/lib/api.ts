@@ -196,6 +196,25 @@ class ApiClient {
             body: JSON.stringify({ query }),
         });
     }
+
+    async submitQuiz(data: {
+        showId: number;
+        showTitle: string;
+        difficulty: string;
+        score: number;
+        totalQuestions: number;
+        questions?: any[];
+        timeTaken?: number;
+    }) {
+        return this.request<{ xpEarned: number; totalXP: number; score: any }>('/quiz/submit', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async getCompletedQuizzes() {
+        return this.request<{ showId: number; difficulty: string }[]>('/quiz/completed');
+    }
 }
 
 // Types

@@ -3,6 +3,7 @@ import authRoutes from './auth';
 import historyRoutes from './history';
 import chatRoutes from './chat';
 import contentRoutes from './content';
+import quizRoutes from './quiz';
 
 const router = Router();
 
@@ -21,5 +22,6 @@ router.use('/auth', authRoutes);
 router.use('/history', historyRoutes);
 router.use('/chat', chatRoutes);
 router.use('/content', contentRoutes);
+router.use('/quiz', quizRoutes);
 
 export default router;

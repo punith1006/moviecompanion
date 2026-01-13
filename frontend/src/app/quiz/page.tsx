@@ -27,10 +27,21 @@ export default function QuizPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [score, setScore] = useState({ correct: 0, total: 0, xp: 0 });
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+    const [takenQuizzes, setTakenQuizzes] = useState<{ showId: number; difficulty: string }[]>([]);
+
+    const { checkAuth } = useAuthStore();
 
     useEffect(() => {
         loadCompletedShows();
+        loadTakenQuizzes();
     }, []);
+
+    const loadTakenQuizzes = async () => {
+        const result = await api.getCompletedQuizzes();
+        if (result.success && result.data) {
+            setTakenQuizzes(result.data);
+        }
+    };
 
     const loadCompletedShows = async () => {
         const result = await api.getWatchHistory({ status: 'completed' });
@@ -69,7 +80,7 @@ export default function QuizPage() {
         setIsLoading(false);
     };
 
-    const handleAnswer = (answerIndex: number) => {
+    const handleAnswer = async (answerIndex: number) => {
         const newAnswers = [...userAnswers, answerIndex];
         setUserAnswers(newAnswers);
 
@@ -82,11 +93,50 @@ export default function QuizPage() {
                 if (answer === questions[i].correct_index) correct++;
             });
 
+            // Calculate optimistic XP (will be overwritten by backend response)
             const xpPerQuestion = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+            let finalXp = correct * xpPerQuestion + (correct === questions.length ? 50 : 0);
+
+            // Submit to backend
+            try {
+                if (selectedShow) {
+                    const result = await api.submitQuiz({
+                        showId: selectedShow.tmdbId,
+                        showTitle: selectedShow.title,
+                        difficulty,
+                        score: correct,
+                        totalQuestions: questions.length,
+                        questions: questions.map((q, i) => ({
+                            question: q.question,
+                            userAnswer: q.options[newAnswers[i]],
+                            correctAnswer: q.options[q.correct_index],
+                            isCorrect: newAnswers[i] === q.correct_index
+                        }))
+                    });
+
+                    if (result.success && result.data) {
+                        finalXp = result.data.xpEarned;
+                        checkAuth(); // Refresh user stats globally!
+                        // Update local taken quizzes
+                        setTakenQuizzes(prev => [...prev, { showId: selectedShow.tmdbId, difficulty }]);
+                    } else {
+                        // Likely already completed or error
+                        console.warn('Quiz submission failed or already completed:', result.error);
+                        if (result.error?.includes('already completed')) {
+                            finalXp = 0;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Quiz submission error:', err);
+                // Fallback: If network error, maybe don't show XP? Or assume 0.
+                finalXp = 0;
+            }
+
             setScore({
                 correct,
                 total: questions.length,
-                xp: correct * xpPerQuestion + (correct === questions.length ? 50 : 0),
+                xp: finalXp,
             });
             setQuizState('results');
         }
@@ -150,8 +200,8 @@ export default function QuizPage() {
                                                         key={show._id}
                                                         onClick={() => setSelectedShow(show)}
                                                         className={`p-3 rounded-xl text-left transition-all ${selectedShow?._id === show._id
-                                                                ? 'bg-violet-500/30 border-2 border-violet-500'
-                                                                : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
+                                                            ? 'bg-violet-500/30 border-2 border-violet-500'
+                                                            : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
                                                             }`}
                                                     >
                                                         <p className="font-medium text-white truncate">{show.title}</p>
@@ -163,18 +213,27 @@ export default function QuizPage() {
                                             <div className="mb-6">
                                                 <label className="block text-sm text-gray-400 mb-2">Difficulty</label>
                                                 <div className="flex gap-2">
-                                                    {(['easy', 'medium', 'hard'] as const).map((d) => (
-                                                        <button
-                                                            key={d}
-                                                            onClick={() => setDifficulty(d)}
-                                                            className={`flex-1 py-2 rounded-lg capitalize transition-all ${difficulty === d
-                                                                    ? 'bg-violet-500 text-white'
-                                                                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
-                                                                }`}
-                                                        >
-                                                            {d}
-                                                        </button>
-                                                    ))}
+                                                    {(['easy', 'medium', 'hard'] as const).map((d) => {
+                                                        const isCompleted = selectedShow && takenQuizzes.some(
+                                                            q => q.showId === selectedShow.tmdbId && q.difficulty === d
+                                                        );
+
+                                                        return (
+                                                            <button
+                                                                key={d}
+                                                                onClick={() => setDifficulty(d)}
+                                                                disabled={isCompleted}
+                                                                className={`flex-1 py-2 rounded-lg capitalize transition-all border ${difficulty === d
+                                                                    ? 'bg-violet-500 text-white border-violet-500'
+                                                                    : isCompleted
+                                                                        ? 'bg-green-500/10 text-green-500 border-green-500/30 cursor-not-allowed'
+                                                                        : 'bg-white/10 text-gray-400 border-transparent hover:bg-white/20'
+                                                                    }`}
+                                                            >
+                                                                {d} {isCompleted && '✓'}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
 
@@ -210,10 +269,10 @@ export default function QuizPage() {
                                                 <div
                                                     key={i}
                                                     className={`w-2 h-2 rounded-full ${i < currentQuestion
-                                                            ? 'bg-violet-500'
-                                                            : i === currentQuestion
-                                                                ? 'bg-violet-400'
-                                                                : 'bg-gray-600'
+                                                        ? 'bg-violet-500'
+                                                        : i === currentQuestion
+                                                            ? 'bg-violet-400'
+                                                            : 'bg-gray-600'
                                                         }`}
                                                 />
                                             ))}
@@ -297,7 +356,7 @@ export default function QuizPage() {
                                         onClick={resetQuiz}
                                         className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 text-white font-semibold hover:from-violet-600 hover:to-purple-700 transition-all"
                                     >
-                                        Play Again
+                                        Done
                                     </button>
                                 </div>
                             </motion.div>
